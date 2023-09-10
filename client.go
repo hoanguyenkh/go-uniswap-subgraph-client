@@ -37,7 +37,22 @@ func NewClient(url string, opts *ClientOptions) *Client {
 	}
 }
 
-func (c *Client) GetPoolById(ctx context.Context, id string, opts *RequestOptions) (*PoolResult, error) {
+func (c *Client) GetFactoryById(ctx context.Context, id string, opts *RequestOptions) (*FactoryResponse, error) {
+	if opts == nil {
+		opts = &RequestOptions{
+			IncludeFields: []string{"*"},
+		}
+	}
+
+	req, err := constructFactoryByIdQuery(id, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return executeRequestAndConvert(ctx, req, FactoryResponse{}, c)
+}
+
+func (c *Client) GetPoolById(ctx context.Context, id string, opts *RequestOptions) (*PoolResponse, error) {
 	if opts == nil {
 		opts = &RequestOptions{
 			IncludeFields: []string{"*"},
@@ -49,12 +64,15 @@ func (c *Client) GetPoolById(ctx context.Context, id string, opts *RequestOption
 		return nil, err
 	}
 
+	return executeRequestAndConvert(ctx, req, PoolResponse{}, c)
+}
+
+func executeRequestAndConvert[T Response](ctx context.Context, req *graphql.Request, converted T, c *Client) (*T, error) {
 	var resp interface{}
 	if err := c.GqlClient.Run(ctx, req, &resp); err != nil {
 		return nil, err
 	}
 
-	var converted PoolResult
 	if err := mapstructure.Decode(resp, &converted); err != nil {
 		return nil, err
 	}
@@ -62,11 +80,18 @@ func (c *Client) GetPoolById(ctx context.Context, id string, opts *RequestOption
 	return &converted, nil
 }
 
+// type constraint for executeRequestAndConvert
+type Response interface {
+	FactoryResponse | PoolResponse | TokenResponse
+}
+
+// options when creating new Client
 type ClientOptions struct {
 	httpClient *http.Client
 	closeReq   bool
 }
 
+// options when creating new Request
 type RequestOptions struct {
 	IncludeFields []string
 	ExcludeFields []string

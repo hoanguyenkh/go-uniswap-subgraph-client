@@ -9,6 +9,33 @@ import (
 	"github.com/emersonmacro/go-uniswap-subgraph-client/graphql"
 )
 
+func constructFactoryByIdQuery(id string, opts *RequestOptions) (*graphql.Request, error) {
+	if !slices.Contains(opts.IncludeFields, "*") && len(opts.ExcludeFields) > 0 {
+		return nil, errors.New("request options error: ExcludeFields can only be provided when IncludeFields is set to '*'")
+	}
+
+	if slices.Contains(opts.IncludeFields, "*") {
+		opts.IncludeFields = gatherAllFactoryByIdFields(opts.ExcludeFields)
+	}
+
+	parts := []string{
+		"query factory($factoryAddress: String!) {",
+		"	factory(id: $factoryAddress) {",
+	}
+
+	for _, field := range opts.IncludeFields {
+		parts = append(parts, fmt.Sprintf("		%s", field))
+	}
+
+	parts = append(parts, "	}", "}")
+	query := strings.Join(parts, "\n")
+
+	req := graphql.NewRequest(query)
+	req.Var("factoryAddress", id)
+
+	return req, nil
+}
+
 func constructPoolByIdQuery(id string, opts *RequestOptions) (*graphql.Request, error) {
 	if !slices.Contains(opts.IncludeFields, "*") && len(opts.ExcludeFields) > 0 {
 		return nil, errors.New("request options error: ExcludeFields can only be provided when IncludeFields is set to '*'")
@@ -61,6 +88,16 @@ func constructPoolByIdQuery(id string, opts *RequestOptions) (*graphql.Request, 
 	req.Var("poolAddress", id)
 
 	return req, nil
+}
+
+func gatherAllFactoryByIdFields(excludeFields []string) []string {
+	fields := []string{}
+	for _, field := range FactoryFields {
+		if !slices.Contains(excludeFields, field) {
+			fields = append(fields, field)
+		}
+	}
+	return fields
 }
 
 func gatherAllPoolByIdFields(excludeFields []string) []string {
