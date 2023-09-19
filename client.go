@@ -44,7 +44,8 @@ func (c *Client) GetFactoryById(ctx context.Context, id string, opts *RequestOpt
 		}
 	}
 
-	req, err := constructFactoryByIdQuery(id, opts)
+	// req, err := constructFactoryByIdQuery(id, opts)
+	req, err := constructByIdQuery(id, FactoryFields, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -59,12 +60,28 @@ func (c *Client) GetPoolById(ctx context.Context, id string, opts *RequestOption
 		}
 	}
 
-	req, err := constructPoolByIdQuery(id, opts)
+	// req, err := constructPoolByIdQuery(id, opts)
+	req, err := constructByIdQuery(id, PoolFields, opts)
 	if err != nil {
 		return nil, err
 	}
 
 	return executeRequestAndConvert(ctx, req, PoolResponse{}, c)
+}
+
+func (c *Client) GetTokenById(ctx context.Context, id string, opts *RequestOptions) (*TokenResponse, error) {
+	if opts == nil {
+		opts = &RequestOptions{
+			IncludeFields: []string{"*"},
+		}
+	}
+
+	req, err := constructByIdQuery(id, TokenFields, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	return executeRequestAndConvert(ctx, req, TokenResponse{}, c)
 }
 
 func executeRequestAndConvert[T Response](ctx context.Context, req *graphql.Request, converted T, c *Client) (*T, error) {

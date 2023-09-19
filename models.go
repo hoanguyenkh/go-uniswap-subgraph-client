@@ -1,5 +1,16 @@
 package unigraphclient
 
+type modelFields struct {
+	direct    []string          // basic scalar types directly on the model e.g. Int, String
+	reference map[string]string // fields that reference other models e.g. Token, Pool
+}
+
+var modelMap map[string]modelFields = map[string]modelFields{
+	"factory": FactoryFields,
+	"pool":    PoolFields,
+	"token":   TokenFields,
+}
+
 type FactoryResponse struct {
 	Factory Factory
 }
@@ -20,21 +31,39 @@ type Factory struct {
 	Owner                        string
 }
 
-var FactoryFields []string = []string{
-	"id",                           // ID!
-	"poolCount",                    // BigInt!
-	"txCount",                      // BigInt!
-	"totalVolumeUSD",               // BigDecimal!
-	"totalVolumeETH",               // BigDecimal!
-	"totalFeesUSD",                 // BigDecimal!
-	"totalFeesETH",                 // BigDecimal!
-	"untrackedVolumeUSD",           // BigDecimal!
-	"totalValueLockedUSD",          // BigDecimal!
-	"totalValueLockedETH",          // BigDecimal!
-	"totalValueLockedUSDUntracked", // BigDecimal!
-	"totalValueLockedETHUntracked", // BigDecimal!
-	"owner",                        // ID!
+var FactoryFields modelFields = modelFields{
+	direct: []string{
+		"id",                           // ID!
+		"poolCount",                    // BigInt!
+		"txCount",                      // BigInt!
+		"totalVolumeUSD",               // BigDecimal!
+		"totalVolumeETH",               // BigDecimal!
+		"totalFeesUSD",                 // BigDecimal!
+		"totalFeesETH",                 // BigDecimal!
+		"untrackedVolumeUSD",           // BigDecimal!
+		"totalValueLockedUSD",          // BigDecimal!
+		"totalValueLockedETH",          // BigDecimal!
+		"totalValueLockedUSDUntracked", // BigDecimal!
+		"totalValueLockedETHUntracked", // BigDecimal!
+		"owner",                        // ID!
+	},
 }
+
+// var FactoryFields []string = []string{
+// 	"id",                           // ID!
+// 	"poolCount",                    // BigInt!
+// 	"txCount",                      // BigInt!
+// 	"totalVolumeUSD",               // BigDecimal!
+// 	"totalVolumeETH",               // BigDecimal!
+// 	"totalFeesUSD",                 // BigDecimal!
+// 	"totalFeesETH",                 // BigDecimal!
+// 	"untrackedVolumeUSD",           // BigDecimal!
+// 	"totalValueLockedUSD",          // BigDecimal!
+// 	"totalValueLockedETH",          // BigDecimal!
+// 	"totalValueLockedUSDUntracked", // BigDecimal!
+// 	"totalValueLockedETHUntracked", // BigDecimal!
+// 	"owner",                        // ID!
+// }
 
 type PoolResponse struct {
 	Pool Pool
@@ -70,47 +99,75 @@ type Pool struct {
 	TotalValueLockedUSD          string
 	TotalValueLockedUSDUntracked string
 	LiquidityProviderCount       string
-	// other fields
 }
 
-var PoolFields []string = []string{
-	"id",                   // ID!
-	"createdAtTimestamp",   // BigInt!
-	"createdAtBlockNumber", // BigInt!
-	// "token0", // Token!
-	// "token1", // Token!
-	"feeTier",                      // BigInt!
-	"liquidity",                    // BigInt!
-	"sqrtPrice",                    // BigInt!
-	"feeGrowthGlobal0X128",         // BigInt!
-	"feeGrowthGlobal1X128",         // BigInt!
-	"token0Price",                  // BigDecimal!
-	"token1Price",                  // BigDecimal!
-	"tick",                         // BigInt!
-	"observationIndex",             // BigInt!
-	"volumeToken0",                 // BigDecimal!
-	"volumeToken1",                 // BigDecimal!
-	"volumeUSD",                    // BigDecimal!
-	"untrackedVolumeUSD",           // BigDecimal!
-	"feesUSD",                      // BigDecimal!
-	"txCount",                      // BigInt!
-	"collectedFeesToken0",          // BigDecimal!
-	"collectedFeesToken1",          // BigDecimal!
-	"collectedFeesUSD",             // BigDecimal!
-	"totalValueLockedToken0",       // BigDecimal!
-	"totalValueLockedToken1",       // BigDecimal!
-	"totalValueLockedETH",          // BigDecimal!
-	"totalValueLockedUSD",          // BigDecimal!
-	"totalValueLockedUSDUntracked", // BigDecimal!
-	"liquidityProviderCount",       // BigInt!
-	// "poolHourData", // [PoolHourData!]! @derivedFrom(field: "pool")
-	// "poolDayData", // [PoolDayData!]! @derivedFrom(field: "pool")
-	// "mints", // [Mint!]! @derivedFrom(field: "pool")
-	// "burns", // [Burn!]! @derivedFrom(field: "pool")
-	// "swaps", // [Swap!]! @derivedFrom(field: "pool")
-	// "collects", // [Collect!]! @derivedFrom(field: "pool")
-	// "ticks", // [Tick!]! @derivedFrom(field: "pool")
+var PoolFields modelFields = modelFields{
+	direct: []string{
+		"id",                           // ID!
+		"createdAtTimestamp",           // BigInt!
+		"createdAtBlockNumber",         // BigInt!
+		"feeTier",                      // BigInt!
+		"liquidity",                    // BigInt!
+		"sqrtPrice",                    // BigInt!
+		"feeGrowthGlobal0X128",         // BigInt!
+		"feeGrowthGlobal1X128",         // BigInt!
+		"token0Price",                  // BigDecimal!
+		"token1Price",                  // BigDecimal!
+		"tick",                         // BigInt!
+		"observationIndex",             // BigInt!
+		"volumeToken0",                 // BigDecimal!
+		"volumeToken1",                 // BigDecimal!
+		"volumeUSD",                    // BigDecimal!
+		"untrackedVolumeUSD",           // BigDecimal!
+		"feesUSD",                      // BigDecimal!
+		"txCount",                      // BigInt!
+		"collectedFeesToken0",          // BigDecimal!
+		"collectedFeesToken1",          // BigDecimal!
+		"collectedFeesUSD",             // BigDecimal!
+		"totalValueLockedToken0",       // BigDecimal!
+		"totalValueLockedToken1",       // BigDecimal!
+		"totalValueLockedETH",          // BigDecimal!
+		"totalValueLockedUSD",          // BigDecimal!
+		"totalValueLockedUSDUntracked", // BigDecimal!
+		"liquidityProviderCount",       // BigInt!
+	},
+	reference: map[string]string{
+		"token0": "token", // Token!
+		"token1": "token", // Token!
+	},
 }
+
+// var PoolFields []string = []string{
+// 	"id",                   // ID!
+// 	"createdAtTimestamp",   // BigInt!
+// 	"createdAtBlockNumber", // BigInt!
+// 	// "token0", // Token!
+// 	// "token1", // Token!
+// 	"feeTier",                      // BigInt!
+// 	"liquidity",                    // BigInt!
+// 	"sqrtPrice",                    // BigInt!
+// 	"feeGrowthGlobal0X128",         // BigInt!
+// 	"feeGrowthGlobal1X128",         // BigInt!
+// 	"token0Price",                  // BigDecimal!
+// 	"token1Price",                  // BigDecimal!
+// 	"tick",                         // BigInt!
+// 	"observationIndex",             // BigInt!
+// 	"volumeToken0",                 // BigDecimal!
+// 	"volumeToken1",                 // BigDecimal!
+// 	"volumeUSD",                    // BigDecimal!
+// 	"untrackedVolumeUSD",           // BigDecimal!
+// 	"feesUSD",                      // BigDecimal!
+// 	"txCount",                      // BigInt!
+// 	"collectedFeesToken0",          // BigDecimal!
+// 	"collectedFeesToken1",          // BigDecimal!
+// 	"collectedFeesUSD",             // BigDecimal!
+// 	"totalValueLockedToken0",       // BigDecimal!
+// 	"totalValueLockedToken1",       // BigDecimal!
+// 	"totalValueLockedETH",          // BigDecimal!
+// 	"totalValueLockedUSD",          // BigDecimal!
+// 	"totalValueLockedUSDUntracked", // BigDecimal!
+// 	"liquidityProviderCount",       // BigInt!
+// }
 
 type TokenResponse struct {
 	Token Token
@@ -132,25 +189,46 @@ type Token struct {
 	TotalValueLockedUSD          string
 	TotalValueLockedUSDUntracked string
 	DerivedETH                   string
-	// other fields
 }
 
-var TokenFields []string = []string{
-	"id",                           // ID!
-	"symbol",                       // String!
-	"name",                         // String!
-	"decimals",                     // BigInt!
-	"totalSupply",                  // BigInt!
-	"volume",                       // BigDecimal!
-	"volumeUSD",                    // BigDecimal!
-	"untrackedVolumeUSD",           // BigDecimal!
-	"feesUSD",                      // BigDecimal!
-	"txCount",                      // BigInt!
-	"poolCount",                    // BigInt!
-	"totalValueLocked",             // BigDecimal!
-	"totalValueLockedUSD",          // BigDecimal!
-	"totalValueLockedUSDUntracked", // BigDecimal!
-	"derivedETH",                   // BigDecimal!
-	// "whitelistPools", // [Pool!]!
-	// "tokenDayData", // [TokenDayData!]! @derivedFrom(field: "token")
+var TokenFields modelFields = modelFields{
+	direct: []string{
+		"id",                           // ID!
+		"symbol",                       // String!
+		"name",                         // String!
+		"decimals",                     // BigInt!
+		"totalSupply",                  // BigInt!
+		"volume",                       // BigDecimal!
+		"volumeUSD",                    // BigDecimal!
+		"untrackedVolumeUSD",           // BigDecimal!
+		"feesUSD",                      // BigDecimal!
+		"txCount",                      // BigInt!
+		"poolCount",                    // BigInt!
+		"totalValueLocked",             // BigDecimal!
+		"totalValueLockedUSD",          // BigDecimal!
+		"totalValueLockedUSDUntracked", // BigDecimal!
+		"derivedETH",                   // BigDecimal!
+	},
+	reference: map[string]string{
+		"whitelistPools": "pool", // [Pool!]!
+	},
 }
+
+// var TokenFields []string = []string{
+// 	"id",                           // ID!
+// 	"symbol",                       // String!
+// 	"name",                         // String!
+// 	"decimals",                     // BigInt!
+// 	"totalSupply",                  // BigInt!
+// 	"volume",                       // BigDecimal!
+// 	"volumeUSD",                    // BigDecimal!
+// 	"untrackedVolumeUSD",           // BigDecimal!
+// 	"feesUSD",                      // BigDecimal!
+// 	"txCount",                      // BigInt!
+// 	"poolCount",                    // BigInt!
+// 	"totalValueLocked",             // BigDecimal!
+// 	"totalValueLockedUSD",          // BigDecimal!
+// 	"totalValueLockedUSDUntracked", // BigDecimal!
+// 	"derivedETH",                   // BigDecimal!
+// 	// "whitelistPools", // [Pool!]!
+// }
