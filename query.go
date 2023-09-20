@@ -37,6 +37,10 @@ func gatherModelFields(model modelFields, excludeFields []string, populateRefs b
 }
 
 func constructByIdQuery(id string, model modelFields, opts *RequestOptions) (*graphql.Request, error) {
+	if opts == nil {
+		opts = &RequestOptions{}
+	}
+
 	if !slices.Contains(opts.IncludeFields, "*") && len(opts.ExcludeFields) > 0 {
 		return nil, errors.New("request options error: ExcludeFields can only be provided when IncludeFields is set to '*'")
 	}
@@ -50,11 +54,16 @@ func constructByIdQuery(id string, model modelFields, opts *RequestOptions) (*gr
 	}
 
 	parts := []string{
-		fmt.Sprintf("query %s($id: String!) {", model),
-		fmt.Sprintf("	%s(id: $id) {", model),
+		fmt.Sprintf("query %s($id: String!) {", model.name),
 	}
 
-	var refFieldMap map[string][]string
+	if opts.Block != 0 {
+		parts = append(parts, fmt.Sprintf("	%s(id: $id, block: {number: %d}) {", model.name, opts.Block))
+	} else {
+		parts = append(parts, fmt.Sprintf("	%s(id: $id) {", model.name))
+	}
+
+	var refFieldMap map[string][]string = make(map[string][]string)
 
 	for _, field := range opts.IncludeFields {
 		isRef := false
@@ -93,6 +102,10 @@ func constructByIdQuery(id string, model modelFields, opts *RequestOptions) (*gr
 
 	req := graphql.NewRequest(query)
 	req.Var("id", id)
+
+	fmt.Println("*** DEBUG ***")
+	fmt.Println(req.Query())
+	fmt.Println("*************")
 
 	return req, nil
 }

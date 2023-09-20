@@ -44,7 +44,6 @@ func (c *Client) GetFactoryById(ctx context.Context, id string, opts *RequestOpt
 		}
 	}
 
-	// req, err := constructFactoryByIdQuery(id, opts)
 	req, err := constructByIdQuery(id, FactoryFields, opts)
 	if err != nil {
 		return nil, err
@@ -60,7 +59,6 @@ func (c *Client) GetPoolById(ctx context.Context, id string, opts *RequestOption
 		}
 	}
 
-	// req, err := constructPoolByIdQuery(id, opts)
 	req, err := constructByIdQuery(id, PoolFields, opts)
 	if err != nil {
 		return nil, err
@@ -110,6 +108,7 @@ type ClientOptions struct {
 
 // options when creating new Request
 type RequestOptions struct {
-	IncludeFields []string
-	ExcludeFields []string
+	IncludeFields []string // fields to include in the query. '*' is a valid option meaning 'include all fields'. if any fields are listed in IncludeFields besides '*', ExcludeFields must be empty.
+	ExcludeFields []string // fields to exclude from the query. only valid when '*' is in IncludeFields.
+	Block         int      // query for data at a specific block number.
 }

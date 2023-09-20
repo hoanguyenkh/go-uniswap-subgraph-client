@@ -1,6 +1,7 @@
 package unigraphclient
 
 type modelFields struct {
+	name      string            // the name of the model
 	direct    []string          // basic scalar types directly on the model e.g. Int, String
 	reference map[string]string // fields that reference other models e.g. Token, Pool
 }
@@ -32,6 +33,7 @@ type Factory struct {
 }
 
 var FactoryFields modelFields = modelFields{
+	name: "factory",
 	direct: []string{
 		"id",                           // ID!
 		"poolCount",                    // BigInt!
@@ -48,22 +50,6 @@ var FactoryFields modelFields = modelFields{
 		"owner",                        // ID!
 	},
 }
-
-// var FactoryFields []string = []string{
-// 	"id",                           // ID!
-// 	"poolCount",                    // BigInt!
-// 	"txCount",                      // BigInt!
-// 	"totalVolumeUSD",               // BigDecimal!
-// 	"totalVolumeETH",               // BigDecimal!
-// 	"totalFeesUSD",                 // BigDecimal!
-// 	"totalFeesETH",                 // BigDecimal!
-// 	"untrackedVolumeUSD",           // BigDecimal!
-// 	"totalValueLockedUSD",          // BigDecimal!
-// 	"totalValueLockedETH",          // BigDecimal!
-// 	"totalValueLockedUSDUntracked", // BigDecimal!
-// 	"totalValueLockedETHUntracked", // BigDecimal!
-// 	"owner",                        // ID!
-// }
 
 type PoolResponse struct {
 	Pool Pool
@@ -102,6 +88,7 @@ type Pool struct {
 }
 
 var PoolFields modelFields = modelFields{
+	name: "pool",
 	direct: []string{
 		"id",                           // ID!
 		"createdAtTimestamp",           // BigInt!
@@ -137,38 +124,6 @@ var PoolFields modelFields = modelFields{
 	},
 }
 
-// var PoolFields []string = []string{
-// 	"id",                   // ID!
-// 	"createdAtTimestamp",   // BigInt!
-// 	"createdAtBlockNumber", // BigInt!
-// 	// "token0", // Token!
-// 	// "token1", // Token!
-// 	"feeTier",                      // BigInt!
-// 	"liquidity",                    // BigInt!
-// 	"sqrtPrice",                    // BigInt!
-// 	"feeGrowthGlobal0X128",         // BigInt!
-// 	"feeGrowthGlobal1X128",         // BigInt!
-// 	"token0Price",                  // BigDecimal!
-// 	"token1Price",                  // BigDecimal!
-// 	"tick",                         // BigInt!
-// 	"observationIndex",             // BigInt!
-// 	"volumeToken0",                 // BigDecimal!
-// 	"volumeToken1",                 // BigDecimal!
-// 	"volumeUSD",                    // BigDecimal!
-// 	"untrackedVolumeUSD",           // BigDecimal!
-// 	"feesUSD",                      // BigDecimal!
-// 	"txCount",                      // BigInt!
-// 	"collectedFeesToken0",          // BigDecimal!
-// 	"collectedFeesToken1",          // BigDecimal!
-// 	"collectedFeesUSD",             // BigDecimal!
-// 	"totalValueLockedToken0",       // BigDecimal!
-// 	"totalValueLockedToken1",       // BigDecimal!
-// 	"totalValueLockedETH",          // BigDecimal!
-// 	"totalValueLockedUSD",          // BigDecimal!
-// 	"totalValueLockedUSDUntracked", // BigDecimal!
-// 	"liquidityProviderCount",       // BigInt!
-// }
-
 type TokenResponse struct {
 	Token Token
 }
@@ -192,6 +147,7 @@ type Token struct {
 }
 
 var TokenFields modelFields = modelFields{
+	name: "token",
 	direct: []string{
 		"id",                           // ID!
 		"symbol",                       // String!
@@ -213,22 +169,3 @@ var TokenFields modelFields = modelFields{
 		"whitelistPools": "pool", // [Pool!]!
 	},
 }
-
-// var TokenFields []string = []string{
-// 	"id",                           // ID!
-// 	"symbol",                       // String!
-// 	"name",                         // String!
-// 	"decimals",                     // BigInt!
-// 	"totalSupply",                  // BigInt!
-// 	"volume",                       // BigDecimal!
-// 	"volumeUSD",                    // BigDecimal!
-// 	"untrackedVolumeUSD",           // BigDecimal!
-// 	"feesUSD",                      // BigDecimal!
-// 	"txCount",                      // BigInt!
-// 	"poolCount",                    // BigInt!
-// 	"totalValueLocked",             // BigDecimal!
-// 	"totalValueLockedUSD",          // BigDecimal!
-// 	"totalValueLockedUSDUntracked", // BigDecimal!
-// 	"derivedETH",                   // BigDecimal!
-// 	// "whitelistPools", // [Pool!]!
-// }
