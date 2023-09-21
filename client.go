@@ -19,16 +19,16 @@ func NewClient(url string, opts *ClientOptions) *Client {
 		opts = &ClientOptions{}
 	}
 
-	if opts.httpClient == nil {
-		opts.httpClient = http.DefaultClient
+	if opts.HttpClient == nil {
+		opts.HttpClient = http.DefaultClient
 	}
 
 	var gqlClient *graphql.Client
 
-	if opts.closeReq {
-		gqlClient = graphql.NewClient(url, graphql.WithHTTPClient(opts.httpClient), graphql.ImmediatelyCloseReqBody())
+	if opts.CloseReq {
+		gqlClient = graphql.NewClient(url, graphql.WithHTTPClient(opts.HttpClient), graphql.ImmediatelyCloseReqBody())
 	} else {
-		gqlClient = graphql.NewClient(url, graphql.WithHTTPClient(opts.httpClient))
+		gqlClient = graphql.NewClient(url, graphql.WithHTTPClient(opts.HttpClient))
 	}
 
 	return &Client{
@@ -101,8 +101,8 @@ type Response interface {
 
 // options when creating new Client
 type ClientOptions struct {
-	httpClient *http.Client
-	closeReq   bool
+	HttpClient *http.Client
+	CloseReq   bool
 }
 
 // options when creating new Request
