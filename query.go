@@ -16,7 +16,7 @@ func constructByIdQuery(id string, model modelFields, opts *RequestOptions) (*gr
 		}
 	}
 
-	err := validateRequestOpts(opts)
+	err := validateRequestOpts(ById, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +51,7 @@ func constructListQuery(model modelFields, opts *RequestOptions) (*graphql.Reque
 		}
 	}
 
-	err := validateRequestOpts(opts)
+	err := validateRequestOpts(List, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -211,13 +211,36 @@ func cutPrefix(s string, prefix string) string {
 	return cut
 }
 
-func validateRequestOpts(opts *RequestOptions) error {
+func validateRequestOpts(queryType QueryType, opts *RequestOptions) error {
 	if len(opts.IncludeFields) == 0 && len(opts.ExcludeFields) == 0 {
 		opts.IncludeFields = []string{"*"}
 	}
 
 	if !slices.Contains(opts.IncludeFields, "*") && len(opts.ExcludeFields) > 0 {
 		return errors.New("request options error: ExcludeFields can only be provided when IncludeFields is set to '*'")
+	}
+
+	switch queryType {
+	case ById:
+		if opts.First != 0 || opts.Skip != 0 || opts.OrderBy != "" || opts.OrderDir != "" {
+			return errors.New("request options error: List query options (First, Skip, OrderBy, OrderDir) should not be provided for ById queries")
+		}
+	case List:
+		if opts.First > 1000 {
+			return errors.New("request options error: First is too large")
+		}
+		if opts.First == 0 {
+			opts.First = 100
+		}
+		if opts.OrderBy == "" {
+			opts.OrderBy = "id"
+		}
+		if opts.OrderDir == "" {
+			opts.OrderDir = "asc"
+		}
+		if opts.OrderDir != "asc" && opts.OrderDir != "desc" {
+			return errors.New("request options error: 'asc' and 'desc' are the only valid options for OrderDir")
+		}
 	}
 
 	return nil
