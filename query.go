@@ -145,11 +145,6 @@ func cutPrefix(s string, prefix string) string {
 	return cut
 }
 
-type fieldRefs struct {
-	directs []string
-	refs    []string
-}
-
 func validateRequestOpts(opts *RequestOptions) error {
 	if len(opts.IncludeFields) == 0 && len(opts.ExcludeFields) == 0 {
 		opts.IncludeFields = []string{"*"}

@@ -9,11 +9,6 @@ import (
 	"github.com/mitchellh/mapstructure"
 )
 
-type Client struct {
-	hostUrl   string
-	GqlClient *graphql.Client
-}
-
 func NewClient(url string, opts *ClientOptions) *Client {
 	if opts == nil {
 		opts = &ClientOptions{}
@@ -75,22 +70,4 @@ func executeRequestAndConvert[T Response](ctx context.Context, req *graphql.Requ
 	}
 
 	return &converted, nil
-}
-
-// type constraint for executeRequestAndConvert
-type Response interface {
-	FactoryResponse | PoolResponse | TokenResponse
-}
-
-// options when creating new Client
-type ClientOptions struct {
-	HttpClient *http.Client
-	CloseReq   bool
-}
-
-// options when creating new Request
-type RequestOptions struct {
-	IncludeFields []string // fields to include in the query. '*' is a valid option meaning 'include all fields'. if any fields are listed in IncludeFields besides '*', ExcludeFields must be empty.
-	ExcludeFields []string // fields to exclude from the query. only valid when '*' is in IncludeFields.
-	Block         int      // query for data at a specific block number.
 }
