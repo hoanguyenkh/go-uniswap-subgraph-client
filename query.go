@@ -15,12 +15,10 @@ func constructByIdQuery(id string, model modelFields, opts *RequestOptions) (*gr
 			IncludeFields: []string{"*"},
 		}
 	}
-	if len(opts.IncludeFields) == 0 && len(opts.ExcludeFields) == 0 {
-		opts.IncludeFields = []string{"*"}
-	}
 
-	if !slices.Contains(opts.IncludeFields, "*") && len(opts.ExcludeFields) > 0 {
-		return nil, errors.New("request options error: ExcludeFields can only be provided when IncludeFields is set to '*'")
+	err := validateRequestOpts(opts)
+	if err != nil {
+		return nil, err
 	}
 
 	if slices.Contains(opts.IncludeFields, "*") {
@@ -150,4 +148,16 @@ func cutPrefix(s string, prefix string) string {
 type fieldRefs struct {
 	directs []string
 	refs    []string
+}
+
+func validateRequestOpts(opts *RequestOptions) error {
+	if len(opts.IncludeFields) == 0 && len(opts.ExcludeFields) == 0 {
+		opts.IncludeFields = []string{"*"}
+	}
+
+	if !slices.Contains(opts.IncludeFields, "*") && len(opts.ExcludeFields) > 0 {
+		return errors.New("request options error: ExcludeFields can only be provided when IncludeFields is set to '*'")
+	}
+
+	return nil
 }

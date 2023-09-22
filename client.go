@@ -38,8 +38,6 @@ func NewClient(url string, opts *ClientOptions) *Client {
 }
 
 func (c *Client) GetFactoryById(ctx context.Context, id string, opts *RequestOptions) (*FactoryResponse, error) {
-	validateRequestOpts(opts)
-
 	req, err := constructByIdQuery(id, FactoryFields, opts)
 	if err != nil {
 		return nil, err
@@ -49,8 +47,6 @@ func (c *Client) GetFactoryById(ctx context.Context, id string, opts *RequestOpt
 }
 
 func (c *Client) GetPoolById(ctx context.Context, id string, opts *RequestOptions) (*PoolResponse, error) {
-	validateRequestOpts(opts)
-
 	req, err := constructByIdQuery(id, PoolFields, opts)
 	if err != nil {
 		return nil, err
@@ -60,25 +56,12 @@ func (c *Client) GetPoolById(ctx context.Context, id string, opts *RequestOption
 }
 
 func (c *Client) GetTokenById(ctx context.Context, id string, opts *RequestOptions) (*TokenResponse, error) {
-	validateRequestOpts(opts)
-
 	req, err := constructByIdQuery(id, TokenFields, opts)
 	if err != nil {
 		return nil, err
 	}
 
 	return executeRequestAndConvert(ctx, req, TokenResponse{}, c)
-}
-
-func validateRequestOpts(opts *RequestOptions) {
-	if opts == nil {
-		opts = &RequestOptions{
-			IncludeFields: []string{"*"},
-		}
-	}
-	if len(opts.IncludeFields) == 0 && len(opts.ExcludeFields) == 0 {
-		opts.IncludeFields = []string{"*"}
-	}
 }
 
 func executeRequestAndConvert[T Response](ctx context.Context, req *graphql.Request, converted T, c *Client) (*T, error) {
