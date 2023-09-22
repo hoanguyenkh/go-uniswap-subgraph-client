@@ -4,6 +4,7 @@ type modelFields struct {
 	name      string            // the name of the model
 	direct    []string          // basic scalar types directly on the model e.g. Int, String
 	reference map[string]string // fields that reference other models e.g. Token, Pool
+	// TODO: add support for derived fields
 }
 
 var modelMap map[string]modelFields = map[string]modelFields{
@@ -14,6 +15,10 @@ var modelMap map[string]modelFields = map[string]modelFields{
 
 type FactoryResponse struct {
 	Factory Factory
+}
+
+type ListFactoriesResponse struct {
+	Factories []Factory
 }
 
 type Factory struct {
@@ -53,6 +58,10 @@ var FactoryFields modelFields = modelFields{
 
 type PoolResponse struct {
 	Pool Pool
+}
+
+type ListPoolsResponse struct {
+	Pools []Pool
 }
 
 type Pool struct {
@@ -126,6 +135,10 @@ var PoolFields modelFields = modelFields{
 
 type TokenResponse struct {
 	Token Token
+}
+
+type ListTokensResponse struct {
+	Tokens []Token
 }
 
 type Token struct {

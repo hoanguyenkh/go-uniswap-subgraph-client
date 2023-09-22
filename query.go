@@ -29,14 +29,86 @@ func constructByIdQuery(id string, model modelFields, opts *RequestOptions) (*gr
 		opts.IncludeFields = fields
 	}
 
-	parts := []string{
-		fmt.Sprintf("query %s($id: String!) {", model.name),
+	query, err := assembleQuery(ById, opts.IncludeFields, model, opts)
+	if err != nil {
+		return nil, err
 	}
 
-	if opts.Block != 0 {
-		parts = append(parts, fmt.Sprintf("	%s(id: $id, block: {number: %d}) {", model.name, opts.Block))
-	} else {
-		parts = append(parts, fmt.Sprintf("	%s(id: $id) {", model.name))
+	req := graphql.NewRequest(query)
+	req.Var("id", id)
+
+	fmt.Println("*** DEBUG req.Query() ***")
+	fmt.Println(req.Query())
+	fmt.Println("*************")
+
+	return req, nil
+}
+
+func constructListQuery(model modelFields, opts *RequestOptions) (*graphql.Request, error) {
+	if opts == nil {
+		opts = &RequestOptions{
+			IncludeFields: []string{"*"},
+		}
+	}
+
+	err := validateRequestOpts(opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if slices.Contains(opts.IncludeFields, "*") {
+		fields, err := gatherModelFields(model, opts.ExcludeFields, true)
+		if err != nil {
+			return nil, err
+		}
+		opts.IncludeFields = fields
+	}
+
+	query, err := assembleQuery(List, opts.IncludeFields, model, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	req := graphql.NewRequest(query)
+	req.Var("first", opts.First)
+	req.Var("skip", opts.Skip)
+	req.Var("orderBy", opts.OrderBy)
+	req.Var("orderDir", opts.OrderDir)
+
+	fmt.Println("*** DEBUG req.Query() ***")
+	fmt.Println(req.Query())
+	fmt.Println("*************")
+
+	return req, nil
+}
+
+// assembles a properly formatted graphql query based on the provided includeFields
+func assembleQuery(queryType QueryType, includeFields []string, model modelFields, opts *RequestOptions) (string, error) {
+	var parts []string
+
+	switch queryType {
+	case ById:
+		parts = []string{
+			fmt.Sprintf("query %s($id: String!) {", model.name),
+		}
+
+		if opts.Block != 0 {
+			parts = append(parts, fmt.Sprintf("	%s(id: $id, block: {number: %d}) {", model.name, opts.Block))
+		} else {
+			parts = append(parts, fmt.Sprintf("	%s(id: $id) {", model.name))
+		}
+	case List:
+		parts = []string{
+			fmt.Sprintf("query %s($first: Int!, $skip: Int!, $orderBy: String!, $orderDir: String!) {", pluralizeModelName(model.name)),
+		}
+
+		if opts.Block != 0 {
+			parts = append(parts, fmt.Sprintf("	%s(first: $first, skip: $skip, orderBy: $orderBy, orderDirection: $orderDir, block: {number: %d}) {", pluralizeModelName(model.name), opts.Block))
+		} else {
+			parts = append(parts, fmt.Sprintf("	%s(first: $first, skip: $skip, orderBy: $orderBy, orderDirection: $orderDir) {", pluralizeModelName(model.name)))
+		}
+	default:
+		return "", fmt.Errorf("unrecognized query type (%v)", queryType)
 	}
 
 	var refFieldMap map[string]fieldRefs = make(map[string]fieldRefs)
@@ -49,7 +121,7 @@ func constructByIdQuery(id string, model modelFields, opts *RequestOptions) (*gr
 				isRef = true
 				refModel, ok := modelMap[v]
 				if !ok {
-					return nil, fmt.Errorf("reference field not found (%s)", k)
+					return "", fmt.Errorf("reference field not found (%s)", k)
 				}
 				fieldWithoutPrefix := cutPrefix(field, prefix)
 				fieldRef := refFieldMap[k]
@@ -58,7 +130,7 @@ func constructByIdQuery(id string, model modelFields, opts *RequestOptions) (*gr
 					fieldRef.refs = append(fieldRef.refs, fieldWithoutPrefix)
 				} else {
 					if !validateField(refModel, fieldWithoutPrefix) {
-						return nil, fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
+						return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
 					}
 					fieldRef.directs = append(fieldRef.directs, fieldWithoutPrefix)
 				}
@@ -68,7 +140,7 @@ func constructByIdQuery(id string, model modelFields, opts *RequestOptions) (*gr
 		}
 		if !isRef {
 			if !validateField(model, field) {
-				return nil, fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
+				return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
 			}
 			parts = append(parts, fmt.Sprintf("		%s", field))
 		}
@@ -84,7 +156,7 @@ func constructByIdQuery(id string, model modelFields, opts *RequestOptions) (*gr
 		for _, ref := range v.refs {
 			fieldSplit := strings.Split(ref, ".")
 			if len(fieldSplit) < 2 {
-				return nil, fmt.Errorf("error parsing reference field (%s)", ref)
+				return "", fmt.Errorf("error parsing reference field (%s)", ref)
 			}
 			parent := fieldSplit[0]
 			child := fieldSplit[1]
@@ -99,16 +171,10 @@ func constructByIdQuery(id string, model modelFields, opts *RequestOptions) (*gr
 	parts = append(parts, "	}", "}")
 	query := strings.Join(parts, "\n")
 
-	req := graphql.NewRequest(query)
-	req.Var("id", id)
-
-	fmt.Println("*** DEBUG req.Query() ***")
-	fmt.Println(req.Query())
-	fmt.Println("*************")
-
-	return req, nil
+	return query, nil
 }
 
+// recursively gathers all fields for the given model, while honoring fields to be excluded
 func gatherModelFields(model modelFields, excludeFields []string, populateRefs bool) ([]string, error) {
 	fields := []string{}
 	for _, field := range model.direct {
@@ -155,4 +221,11 @@ func validateRequestOpts(opts *RequestOptions) error {
 	}
 
 	return nil
+}
+
+func pluralizeModelName(name string) string {
+	if name == "factory" {
+		return "factories"
+	}
+	return fmt.Sprintf("%ss", name)
 }
