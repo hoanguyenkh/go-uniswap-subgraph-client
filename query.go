@@ -212,7 +212,7 @@ func cutPrefix(s string, prefix string) string {
 }
 
 func validateRequestOpts(queryType QueryType, opts *RequestOptions) error {
-	if len(opts.IncludeFields) == 0 && len(opts.ExcludeFields) == 0 {
+	if len(opts.IncludeFields) == 0 {
 		opts.IncludeFields = []string{"*"}
 	}
 
@@ -227,7 +227,7 @@ func validateRequestOpts(queryType QueryType, opts *RequestOptions) error {
 		}
 	case List:
 		if opts.First > 1000 {
-			return errors.New("request options error: First is too large")
+			return errors.New("request options error: First is too large (must be <= 1000)")
 		}
 		if opts.First == 0 {
 			opts.First = 100
