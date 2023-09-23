@@ -193,10 +193,16 @@ func gatherModelFields(model modelFields, excludeFields []string, populateRefs b
 				return nil, err
 			}
 			for _, refField := range refFields {
-				fields = append(fields, fmt.Sprintf("%s.%s", k, refField))
+				fullRef := fmt.Sprintf("%s.%s", k, refField)
+				if !slices.Contains(excludeFields, fullRef) {
+					fields = append(fields, fullRef)
+				}
 			}
 		} else {
-			fields = append(fields, fmt.Sprintf("%s.id", k))
+			refWithId := fmt.Sprintf("%s.id", k)
+			if !slices.Contains(excludeFields, refWithId) {
+				fields = append(fields, refWithId)
+			}
 		}
 	}
 	return fields, nil

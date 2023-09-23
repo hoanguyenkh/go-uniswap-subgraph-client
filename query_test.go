@@ -6,6 +6,71 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestGatherModelFields(t *testing.T) {
+	tests := map[string]struct {
+		model         modelFields
+		excludeFields []string
+		populateRefs  bool
+		wantLen       int
+		wantErr       bool
+		wantErrMsg    string
+	}{
+		"when reference model is invalid": {
+			model: modelFields{
+				reference: map[string]string{
+					"not found": "",
+				},
+			},
+			populateRefs: true,
+			wantErr:      true,
+			wantErrMsg:   "reference field not found",
+		},
+		"when model has no references and excludeFields is empty": {
+			model:   FactoryFields,
+			wantLen: 13,
+		},
+		"when model has no references and excludeFields is not empty": {
+			model:         FactoryFields,
+			excludeFields: []string{"owner", "txCount"},
+			wantLen:       11,
+		},
+		"when model has references, excludeFields is empty, and populateRefs is false": {
+			model:   PoolFields,
+			wantLen: 29,
+		},
+		"when model has references, excludeFields is not empty, and populateRefs is false": {
+			model:         PoolFields,
+			excludeFields: []string{"feeTier", "token0.id"},
+			wantLen:       27,
+		},
+		"when model has references, excludeFields is empty, and populateRefs is true": {
+			model:        PoolFields,
+			populateRefs: true,
+			wantLen:      59,
+		},
+		"when model has references, excludeFields is not empty, and populateRefs is true": {
+			model:         PoolFields,
+			excludeFields: []string{"feeTier", "token0.id"},
+			populateRefs:  true,
+			wantLen:       57,
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			got, err := gatherModelFields(test.model, test.excludeFields, test.populateRefs)
+
+			if test.wantErr {
+				assert.NotNil(t, err)
+				assert.Contains(t, err.Error(), test.wantErrMsg)
+			} else {
+				assert.Nil(t, err)
+				assert.Equal(t, test.wantLen, len(got))
+			}
+		})
+	}
+}
+
 func TestValidateField(t *testing.T) {
 	tests := map[string]struct {
 		model modelFields
