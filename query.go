@@ -29,7 +29,7 @@ func constructByIdQuery(id string, model modelFields, opts *RequestOptions) (*gr
 		opts.IncludeFields = fields
 	}
 
-	query, err := assembleQuery(ById, opts.IncludeFields, model, opts)
+	query, err := assembleQuery(ById, model, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func constructListQuery(model modelFields, opts *RequestOptions) (*graphql.Reque
 		opts.IncludeFields = fields
 	}
 
-	query, err := assembleQuery(List, opts.IncludeFields, model, opts)
+	query, err := assembleQuery(List, model, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func constructListQuery(model modelFields, opts *RequestOptions) (*graphql.Reque
 }
 
 // assembles a properly formatted graphql query based on the provided includeFields
-func assembleQuery(queryType QueryType, includeFields []string, model modelFields, opts *RequestOptions) (string, error) {
+func assembleQuery(queryType QueryType, model modelFields, opts *RequestOptions) (string, error) {
 	var parts []string
 
 	switch queryType {

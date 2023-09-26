@@ -6,6 +6,176 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func TestConstructByIdQuery(t *testing.T) {
+	t.Run("when request options are valid", func(t *testing.T) {
+		opts := &RequestOptions{
+			IncludeFields: []string{"id"},
+		}
+		testId := "test"
+		req, err := constructByIdQuery(testId, PoolFields, opts)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, req)
+
+		vars := req.Vars()
+		id, ok := vars["id"]
+		assert.True(t, ok)
+		assert.Equal(t, testId, id)
+	})
+
+	t.Run("when query assembly fails", func(t *testing.T) {
+		opts := &RequestOptions{
+			IncludeFields: []string{"not found"},
+		}
+		_, err := constructByIdQuery("test", PoolFields, opts)
+
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "not found")
+	})
+
+	t.Run("when gathering all model fields fails", func(t *testing.T) {
+		model := modelFields{
+			reference: map[string]string{
+				"not found": "",
+			},
+		}
+		_, err := constructByIdQuery("test", model, nil)
+
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "reference field not found")
+	})
+
+	t.Run("when request options validation fails", func(t *testing.T) {
+		opts := &RequestOptions{
+			IncludeFields: []string{"id", "liquidity"},
+			ExcludeFields: []string{"id", "liquidity"},
+		}
+		_, err := constructByIdQuery("test", PoolFields, opts)
+
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "request options error")
+	})
+}
+
+func TestConstructListQuery(t *testing.T) {
+	t.Run("when request options are valid", func(t *testing.T) {
+		opts := &RequestOptions{
+			IncludeFields: []string{"id"},
+			First:         50,
+		}
+		req, err := constructListQuery(PoolFields, opts)
+
+		assert.Nil(t, err)
+		assert.NotNil(t, req)
+
+		vars := req.Vars()
+		first, ok := vars["first"]
+		assert.True(t, ok)
+		assert.Equal(t, 50, first)
+	})
+
+	t.Run("when query assembly fails", func(t *testing.T) {
+		opts := &RequestOptions{
+			IncludeFields: []string{"not found"},
+		}
+		_, err := constructListQuery(PoolFields, opts)
+
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "not found")
+	})
+
+	t.Run("when gathering all model fields fails", func(t *testing.T) {
+		model := modelFields{
+			reference: map[string]string{
+				"not found": "",
+			},
+		}
+		_, err := constructListQuery(model, nil)
+
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "reference field not found")
+	})
+
+	t.Run("when request options validation fails", func(t *testing.T) {
+		opts := &RequestOptions{
+			IncludeFields: []string{"id", "liquidity"},
+			ExcludeFields: []string{"id", "liquidity"},
+		}
+		_, err := constructListQuery(PoolFields, opts)
+
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "request options error")
+	})
+}
+
+func TestAssembleQuery(t *testing.T) {
+	t.Run("when query type is ById", func(t *testing.T) {
+		opts := &RequestOptions{
+			IncludeFields: []string{"id"},
+		}
+		query, err := assembleQuery(ById, PoolFields, opts)
+
+		assert.Nil(t, err)
+		assert.Greater(t, len(query), 0)
+	})
+
+	t.Run("when query type is List", func(t *testing.T) {
+		opts := &RequestOptions{
+			IncludeFields: []string{"id"},
+		}
+		query, err := assembleQuery(List, PoolFields, opts)
+
+		assert.Nil(t, err)
+		assert.Greater(t, len(query), 0)
+	})
+
+	t.Run("when query type is unrecognized", func(t *testing.T) {
+		opts := &RequestOptions{
+			IncludeFields: []string{"id"},
+		}
+		_, err := assembleQuery(1000, PoolFields, opts)
+
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "unrecognized query type")
+	})
+
+	t.Run("when reference field doesn't exist", func(t *testing.T) {
+		model := modelFields{
+			direct: []string{"id"},
+			reference: map[string]string{
+				"notFound": "",
+			},
+		}
+		opts := &RequestOptions{
+			IncludeFields: []string{"id", "notFound.id"},
+		}
+		_, err := assembleQuery(ById, model, opts)
+
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "reference field not found")
+	})
+
+	t.Run("when reference sub-field doesn't exist", func(t *testing.T) {
+		opts := &RequestOptions{
+			IncludeFields: []string{"id", "token0.notFound"},
+		}
+		_, err := assembleQuery(ById, PoolFields, opts)
+
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "unrecognized field given in opts.IncludeFields")
+	})
+
+	t.Run("when direct field doesn't exist", func(t *testing.T) {
+		opts := &RequestOptions{
+			IncludeFields: []string{"id", "notFound"},
+		}
+		_, err := assembleQuery(ById, PoolFields, opts)
+
+		assert.NotNil(t, err)
+		assert.Contains(t, err.Error(), "unrecognized field given in opts.IncludeFields")
+	})
+}
+
 func TestGatherModelFields(t *testing.T) {
 	tests := map[string]struct {
 		model         modelFields
@@ -290,9 +460,6 @@ func TestPluralizeModelName(t *testing.T) {
 			got := pluralizeModelName(test.name)
 
 			assert.Equal(t, test.want, got)
-			// if got != test.want {
-			// 	t.Errorf("plural name doesn't match. want: `%v` got: `%v`", test.want, got)
-			// }
 		})
 	}
 }
