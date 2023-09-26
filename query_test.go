@@ -109,6 +109,7 @@ func TestConstructListQuery(t *testing.T) {
 }
 
 func TestAssembleQuery(t *testing.T) {
+	// TODO: add more test cases based on IncludeFields & ExcludeFields combinations
 	t.Run("when query type is ById", func(t *testing.T) {
 		opts := &RequestOptions{
 			IncludeFields: []string{"id"},
