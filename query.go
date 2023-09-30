@@ -108,6 +108,7 @@ func assembleQuery(queryType QueryType, model modelFields, opts *RequestOptions)
 
 	var refFieldMap map[string]fieldRefs = make(map[string]fieldRefs)
 
+	// TODO: think about ways to make the rest of this function more comprehensible
 	for _, field := range opts.IncludeFields {
 		isRef := false
 		for k, v := range model.reference {
@@ -121,7 +122,14 @@ func assembleQuery(queryType QueryType, model modelFields, opts *RequestOptions)
 				fieldWithoutPrefix := cutPrefix(field, prefix)
 				fieldRef := refFieldMap[k]
 				if strings.Contains(fieldWithoutPrefix, ".") {
-					// TODO: validate reference to reference field
+					subRefFields := strings.Split(fieldWithoutPrefix, ".")
+					subRefModel, ok := modelMap[refModel.reference[subRefFields[0]]]
+					if !ok {
+						return "", fmt.Errorf("sub-reference field not found (%s)", fieldWithoutPrefix)
+					}
+					if !validateField(subRefModel, subRefFields[1]) {
+						return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
+					}
 					fieldRef.refs = append(fieldRef.refs, fieldWithoutPrefix)
 				} else {
 					if !validateField(refModel, fieldWithoutPrefix) {
@@ -142,7 +150,6 @@ func assembleQuery(queryType QueryType, model modelFields, opts *RequestOptions)
 	}
 
 	for k, v := range refFieldMap {
-		// TODO: add validation
 		parts = append(parts, fmt.Sprintf("		%s {", k))
 		if len(v.directs) > 0 {
 			parts = append(parts, "			"+strings.Join(v.directs, "\n			"))

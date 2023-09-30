@@ -1,6 +1,7 @@
 package unigraphclient
 
 import (
+	"slices"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -130,6 +131,26 @@ func TestAssembleQuery(t *testing.T) {
 		assert.Greater(t, len(query), 0)
 	})
 
+	t.Run("when opts.Block is set", func(t *testing.T) {
+		byIdOpts := &RequestOptions{
+			IncludeFields: []string{"id"},
+			Block:         1000000,
+		}
+		byIdQuery, err := assembleQuery(ById, PoolFields, byIdOpts)
+
+		assert.Nil(t, err)
+		assert.Greater(t, len(byIdQuery), 0)
+
+		listOpts := &RequestOptions{
+			IncludeFields: []string{"id"},
+			Block:         1000000,
+		}
+		listQuery, err := assembleQuery(List, PoolFields, listOpts)
+
+		assert.Nil(t, err)
+		assert.Greater(t, len(listQuery), 0)
+	})
+
 	t.Run("when query type is unrecognized", func(t *testing.T) {
 		opts := &RequestOptions{
 			IncludeFields: []string{"id"},
@@ -175,6 +196,73 @@ func TestAssembleQuery(t *testing.T) {
 		assert.NotNil(t, err)
 		assert.Contains(t, err.Error(), "unrecognized field given in opts.IncludeFields")
 	})
+}
+
+func TestAssembleQuery_FieldCombinations(t *testing.T) {
+	tests := map[string]struct {
+		model         modelFields
+		includeFields []string
+		excludeFields []string
+		wantErr       bool
+		wantErrMsg    string
+	}{
+		"factory include (valid)": {
+			model:         FactoryFields,
+			includeFields: []string{"id", "owner"},
+			excludeFields: []string{},
+		},
+		"factory exclude (valid)": {
+			model:         FactoryFields,
+			includeFields: []string{"*"},
+			excludeFields: []string{"totalValueLockedUSDUntracked", "totalValueLockedETHUntracked"},
+		},
+		"pool include (valid)": {
+			model:         PoolFields,
+			includeFields: []string{"id", "txCount", "token0.id", "token1.derivedETH", "token1.whitelistPools.txCount"},
+			excludeFields: []string{},
+		},
+		"pool include (invalid)": {
+			model:         PoolFields,
+			includeFields: []string{"id", "txCount", "token1.whitelistPools.notFound"},
+			excludeFields: []string{},
+			wantErr:       true,
+			wantErrMsg:    "unrecognized field",
+		},
+		"pool exclude (valid)": {
+			model:         PoolFields,
+			includeFields: []string{"*"},
+			excludeFields: []string{"feeTier", "token0.symbol", "token1.whitelistPools.txCount"},
+		},
+	}
+
+	for name, test := range tests {
+		t.Run(name, func(t *testing.T) {
+			if slices.Contains(test.includeFields, "*") {
+				fields, err := gatherModelFields(test.model, test.excludeFields, true)
+				if err != nil {
+					t.Fatal(err)
+				}
+				test.includeFields = fields
+			}
+
+			opts := &RequestOptions{
+				IncludeFields: test.includeFields,
+				ExcludeFields: test.excludeFields,
+			}
+			_, byIdErr := assembleQuery(ById, test.model, opts)
+			_, listErr := assembleQuery(List, test.model, opts)
+
+			if test.wantErr {
+				assert.NotNil(t, byIdErr)
+				assert.Contains(t, byIdErr.Error(), test.wantErrMsg)
+				assert.NotNil(t, listErr)
+				assert.Contains(t, listErr.Error(), test.wantErrMsg)
+			} else {
+				assert.Nil(t, byIdErr)
+				assert.Nil(t, listErr)
+			}
+		})
+	}
 }
 
 func TestGatherModelFields(t *testing.T) {
