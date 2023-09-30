@@ -86,26 +86,21 @@ func constructListQuery(model modelFields, opts *RequestOptions) (*graphql.Reque
 func assembleQuery(queryType QueryType, model modelFields, opts *RequestOptions) (string, error) {
 	var parts []string
 
+	var blockSubstr string = ""
+	if opts.Block != 0 {
+		blockSubstr = fmt.Sprintf(", block: {number: %d}", opts.Block)
+	}
+
 	switch queryType {
 	case ById:
 		parts = []string{
 			fmt.Sprintf("query %s($id: String!) {", model.name),
-		}
-
-		if opts.Block != 0 {
-			parts = append(parts, fmt.Sprintf("	%s(id: $id, block: {number: %d}) {", model.name, opts.Block))
-		} else {
-			parts = append(parts, fmt.Sprintf("	%s(id: $id) {", model.name))
+			fmt.Sprintf("	%s(id: $id%s) {", model.name, blockSubstr),
 		}
 	case List:
 		parts = []string{
 			fmt.Sprintf("query %s($first: Int!, $skip: Int!, $orderBy: String!, $orderDir: String!) {", pluralizeModelName(model.name)),
-		}
-
-		if opts.Block != 0 {
-			parts = append(parts, fmt.Sprintf("	%s(first: $first, skip: $skip, orderBy: $orderBy, orderDirection: $orderDir, block: {number: %d}) {", pluralizeModelName(model.name), opts.Block))
-		} else {
-			parts = append(parts, fmt.Sprintf("	%s(first: $first, skip: $skip, orderBy: $orderBy, orderDirection: $orderDir) {", pluralizeModelName(model.name)))
+			fmt.Sprintf("	%s(first: $first, skip: $skip, orderBy: $orderBy, orderDirection: $orderDir%s) {", pluralizeModelName(model.name), blockSubstr),
 		}
 	default:
 		return "", fmt.Errorf("unrecognized query type (%v)", queryType)
