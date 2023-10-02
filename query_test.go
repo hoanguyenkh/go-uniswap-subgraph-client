@@ -233,6 +233,16 @@ func TestAssembleQuery_FieldCombinations(t *testing.T) {
 			includeFields: []string{"*"},
 			excludeFields: []string{"feeTier", "token0.symbol", "token1.whitelistPools.txCount"},
 		},
+		"token include (valid)": {
+			model:         TokenFields,
+			includeFields: []string{"*", "id", "decimals", "whitelistPools.txCount"},
+			excludeFields: []string{},
+		},
+		"token exclude (valid)": {
+			model:         TokenFields,
+			includeFields: []string{"*"},
+			excludeFields: []string{"id", "derivedETH", "notFound"}, // opts.ExcludeFields are not validated currently
+		},
 	}
 
 	for name, test := range tests {
