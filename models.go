@@ -8,9 +8,14 @@ type modelFields struct {
 }
 
 var modelMap map[string]modelFields = map[string]modelFields{
-	"factory": FactoryFields,
-	"pool":    PoolFields,
-	"token":   TokenFields,
+	"factory":          FactoryFields,
+	"pool":             PoolFields,
+	"token":            TokenFields,
+	"bundle":           BundleFields,
+	"tick":             TickFields,
+	"position":         PositionFields,
+	"positionSnapshot": PositionSnapshotFields,
+	"transaction":      TransactionFields,
 }
 
 type FactoryResponse struct {
@@ -180,5 +185,218 @@ var TokenFields modelFields = modelFields{
 	},
 	reference: map[string]string{
 		"whitelistPools": "pool", // [Pool!]!
+	},
+}
+
+type BundleResponse struct {
+	Bundle Bundle
+}
+
+type ListBundlesResponse struct {
+	Bundles []Bundle
+}
+
+type Bundle struct {
+	ID          string
+	EthPriceUSD string
+}
+
+var BundleFields modelFields = modelFields{
+	name: "bundle",
+	direct: []string{
+		"id",          // ID!
+		"ethPriceUSD", // BigDecimal!
+	},
+}
+
+type TickResponse struct {
+	Tick Tick
+}
+
+type ListTicksResponse struct {
+	Ticks []Tick
+}
+
+type Tick struct {
+	ID                     string
+	PoolAddress            string
+	TickIdx                string
+	Pool                   Pool
+	LiquidityGross         string
+	LiquidityNet           string
+	Price0                 string
+	Price1                 string
+	VolumeToken0           string
+	VolumeToken1           string
+	VolumeUSD              string
+	UntrackedVolumeUSD     string
+	FeesUSD                string
+	CollectedFeesToken0    string
+	CollectedFeesToken1    string
+	CollectedFeesUSD       string
+	CreatedAtTimestamp     string
+	CreatedAtBlockNumber   string
+	LiquidityProviderCount string
+	FeeGrowthOutside0X128  string
+	FeeGrowthOutside1X128  string
+}
+
+var TickFields modelFields = modelFields{
+	name: "tick",
+	direct: []string{
+		"id",                     // ID!
+		"poolAddress",            // String
+		"tickIdx",                // BigInt!
+		"liquidityGross",         // BigInt!
+		"liquidityNet",           // BigInt!
+		"price0",                 // BigDecimal!
+		"price1",                 // BigDecimal!
+		"volumeToken0",           // BigDecimal!
+		"volumeToken1",           // BigDecimal!
+		"volumeUSD",              // BigDecimal!
+		"untrackedVolumeUSD",     // BigDecimal!
+		"feesUSD",                // BigDecimal!
+		"collectedFeesToken0",    // BigDecimal!
+		"collectedFeesToken1",    // BigDecimal!
+		"collectedFeesUSD",       // BigDecimal!
+		"createdAtTimestamp",     // BigInt!
+		"createdAtBlockNumber",   // BigInt!
+		"liquidityProviderCount", // BigInt!
+		"feeGrowthOutside0X128",  // BigInt!
+		"feeGrowthOutside1X128",  // BigInt!
+	},
+	reference: map[string]string{
+		"pool": "pool", // Pool!
+	},
+}
+
+type PositionResponse struct {
+	Position Position
+}
+
+type ListPositionsResponse struct {
+	Positions []Position
+}
+
+type Position struct {
+	ID                       string
+	Owner                    string
+	Pool                     Pool
+	Token0                   Token
+	Token1                   Token
+	TickLower                Tick
+	TickUpper                Tick
+	Liquidity                string
+	DepositedToken0          string
+	DepositedToken1          string
+	WithdrawnToken0          string
+	WithdrawnToken1          string
+	CollectedFeesToken0      string
+	CollectedFeesToken1      string
+	Transaction              Transaction
+	FeeGrowthInside0LastX128 string
+	FeeGrowthInside1LastX128 string
+}
+
+var PositionFields modelFields = modelFields{
+	name: "position",
+	direct: []string{
+		"id",                       // ID!
+		"owner",                    // Bytes!
+		"liquidity",                // BigInt!
+		"depositedToken0",          // BigDecimal!
+		"depositedToken1",          // BigDecimal!
+		"withdrawnToken0",          // BigDecimal!
+		"withdrawnToken1",          // BigDecimal!
+		"collectedFeesToken0",      // BigDecimal!
+		"collectedFeesToken1",      // BigDecimal!
+		"feeGrowthInside0LastX128", // BigInt!
+		"feeGrowthInside1LastX128", // BigInt!
+	},
+	reference: map[string]string{
+		"pool":        "pool",        // Pool!
+		"token0":      "token",       // Token!
+		"token1":      "token",       // Token!
+		"tickLower":   "tick",        // Tick!
+		"tickUpper":   "tick",        // Tick!
+		"transaction": "transaction", // Transaction!
+	},
+}
+
+type PositionSnapshotResponse struct {
+	PositionSnapshot PositionSnapshot
+}
+
+type ListPositionSnapshotsResponse struct {
+	PositionSnapshots []PositionSnapshot
+}
+
+type PositionSnapshot struct {
+	ID                       string
+	Owner                    string
+	Pool                     Pool
+	Position                 Position
+	BlockNumber              string
+	Timestamp                string
+	Liquidity                string
+	DepositedToken0          string
+	DepositedToken1          string
+	WithdrawnToken0          string
+	WithdrawnToken1          string
+	CollectedFeesToken0      string
+	CollectedFeesToken1      string
+	Transaction              Transaction
+	FeeGrowthInside0LastX128 string
+	FeeGrowthInside1LastX128 string
+}
+
+var PositionSnapshotFields modelFields = modelFields{
+	name: "positionSnapshot",
+	direct: []string{
+		"id",                       // ID!
+		"owner",                    // Bytes!
+		"blockNumber",              // BigInt!
+		"timestamp",                // BigInt!
+		"liquidity",                // BigInt!
+		"depositedToken0",          // BigDecimal!
+		"depositedToken1",          // BigDecimal!
+		"withdrawnToken0",          // BigDecimal!
+		"withdrawnToken1",          // BigDecimal!
+		"collectedFeesToken0",      // BigDecimal!
+		"collectedFeesToken1",      // BigDecimal!
+		"feeGrowthInside0LastX128", // BigInt!
+		"feeGrowthInside1LastX128", // BigInt!
+	},
+	reference: map[string]string{
+		"pool":        "pool",        // Pool!
+		"position":    "position",    // Position!
+		"transaction": "transaction", // Transaction!
+	},
+}
+
+type TransactionResponse struct {
+	Transaction Transaction
+}
+
+type ListTransactionsResponse struct {
+	Transactions []Transaction
+}
+
+type Transaction struct {
+	ID          string
+	BlockNumber string
+	Timestamp   string
+	GasUsed     string
+	GasPrice    string
+}
+
+var TransactionFields modelFields = modelFields{
+	name: "transaction",
+	direct: []string{
+		"id",          // ID!
+		"blockNumber", // BigInt!
+		"timestamp",   // BigInt!
+		"gasUsed",     // BigInt!
+		"gasPrice",    // BigInt!
 	},
 }
