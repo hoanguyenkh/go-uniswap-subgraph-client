@@ -258,5 +258,8 @@ func pluralizeModelName(name string) string {
 	if name == "factory" {
 		return "factories"
 	}
+	if name == "flash" {
+		return "flashes"
+	}
 	return fmt.Sprintf("%ss", name)
 }

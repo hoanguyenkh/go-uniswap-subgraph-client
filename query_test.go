@@ -548,9 +548,13 @@ func TestPluralizeModelName(t *testing.T) {
 			name: "pool",
 			want: "pools",
 		},
-		"special case": {
+		"special case 1": {
 			name: "factory",
 			want: "factories",
+		},
+		"special case 2": {
+			name: "flash",
+			want: "flashes",
 		},
 	}
 

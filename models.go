@@ -1,5 +1,7 @@
 package unigraphclient
 
+// graphql types transcribed from https://github.com/Uniswap/v3-subgraph/blob/main/schema.graphql
+
 type modelFields struct {
 	name      string            // the name of the model
 	direct    []string          // basic scalar types directly on the model e.g. Int, String
@@ -398,5 +400,565 @@ var TransactionFields modelFields = modelFields{
 		"timestamp",   // BigInt!
 		"gasUsed",     // BigInt!
 		"gasPrice",    // BigInt!
+	},
+}
+
+type MintResponse struct {
+	Mint Mint
+}
+
+type ListMintsResponse struct {
+	Mints []Mint
+}
+
+type Mint struct {
+	ID          string
+	Transaction Transaction
+	Timestamp   string
+	Pool        Pool
+	Token0      Token
+	Token1      Token
+	Owner       string
+	Sender      string
+	Origin      string
+	Amount      string
+	Amount0     string
+	Amount1     string
+	AmountUSD   string
+	TickLower   string
+	TickUpper   string
+	LogIndex    string
+}
+
+var MintFields modelFields = modelFields{
+	name: "mint",
+	direct: []string{
+		"id",        // ID!
+		"timestamp", // BigInt!
+		"owner",     // Bytes!
+		"sender",    // Bytes!
+		"origin",    // Bytes!
+		"amount",    // BigInt!
+		"amount0",   // BigDecimal!
+		"amount1",   // BigDecimal!
+		"amountUSD", // BigDecimal!
+		"tickLower", // BigInt!
+		"tickUpper", // BigInt!
+		"logIndex",  // BigInt
+	},
+	reference: map[string]string{
+		"transaction": "transaction", // Transaction!
+		"pool":        "pool",        // Pool!
+		"token0":      "token",       // Token!
+		"token1":      "token",       // Token!
+	},
+}
+
+type BurnResponse struct {
+	Burn Burn
+}
+
+type ListBurnsResponse struct {
+	Burns []Burn
+}
+
+type Burn struct {
+	ID          string
+	Transaction Transaction
+	Pool        Pool
+	Token0      Token
+	Token1      Token
+	Timestamp   string
+	Owner       string
+	Origin      string
+	Amount      string
+	Amount0     string
+	Amount1     string
+	AmountUSD   string
+	TickLower   string
+	TickUpper   string
+	LogIndex    string
+}
+
+var BurnFields modelFields = modelFields{
+	name: "burn",
+	direct: []string{
+		"id",        // ID!
+		"timestamp", // BigInt!
+		"owner",     // Bytes!
+		"origin",    // Bytes!
+		"amount",    // BigInt!
+		"amount0",   // BigDecimal!
+		"amount1",   // BigDecimal!
+		"amountUSD", // BigDecimal!
+		"tickLower", // BigInt!
+		"tickUpper", // BigInt!
+		"logIndex",  // BigInt
+	},
+	reference: map[string]string{
+		"transaction": "transaction", // Transaction!
+		"pool":        "pool",        // Pool!
+		"token0":      "token",       // Token!
+		"token1":      "token",       // Token!
+	},
+}
+
+type SwapResponse struct {
+	Swap Swap
+}
+
+type ListSwapsResponse struct {
+	Swaps []Swap
+}
+
+type Swap struct {
+	ID           string
+	Transaction  Transaction
+	Timestamp    string
+	Pool         Pool
+	Token0       Token
+	Token1       Token
+	Sender       string
+	Recipient    string
+	Origin       string
+	Amount0      string
+	Amount1      string
+	AmountUSD    string
+	SqrtPriceX96 string
+	Tick         string
+	LogIndex     string
+}
+
+var SwapFields modelFields = modelFields{
+	name: "swap",
+	direct: []string{
+		"id",           // ID!
+		"timestamp",    // BigInt!
+		"sender",       // Bytes!
+		"recipient",    // Bytes!
+		"origin",       // Bytes!
+		"amount0",      // BigDecimal!
+		"amount1",      // BigDecimal!
+		"amountUSD",    // BigDecimal!
+		"sqrtPriceX96", // BigInt!
+		"tick",         // BigInt!
+		"logIndex",     // BigInt
+	},
+	reference: map[string]string{
+		"transaction": "transaction", // Transaction!
+		"pool":        "pool",        // Pool!
+		"token0":      "token",       // Token!
+		"token1":      "token",       // Token!
+	},
+}
+
+type CollectResponse struct {
+	Collect Collect
+}
+
+type ListCollectsResponse struct {
+	Collects []Collect
+}
+
+type Collect struct {
+	ID          string
+	Transaction Transaction
+	Timestamp   string
+	Pool        Pool
+	Owner       string
+	Amount0     string
+	Amount1     string
+	AmountUSD   string
+	TickLower   string
+	TickUpper   string
+	LogIndex    string
+}
+
+var CollectFields modelFields = modelFields{
+	name: "collect",
+	direct: []string{
+		"id",        // ID!
+		"timestamp", // BigInt!
+		"owner",     // Bytes
+		"amount0",   // BigDecimal!
+		"amount1",   // BigDecimal!
+		"amountUSD", // BigDecimal
+		"tickLower", // BigInt!
+		"tickUpper", // BigInt!
+		"logIndex",  // BigInt
+	},
+	reference: map[string]string{
+		"transaction": "transaction", // Transaction!
+		"pool":        "pool",        // Pool!
+	},
+}
+
+type FlashResponse struct {
+	Flash Flash
+}
+
+type ListFlashesResponse struct {
+	Flashes []Flash
+}
+
+type Flash struct {
+	ID          string
+	Transaction Transaction
+	Timestamp   string
+	Pool        Pool
+	Sender      string
+	Recipient   string
+	Amount0     string
+	Amount1     string
+	AmountUSD   string
+	Amount0Paid string
+	Amount1Paid string
+	LogIndex    string
+}
+
+var FlashFields modelFields = modelFields{
+	name: "flash",
+	direct: []string{
+		"id",          // ID!
+		"timestamp",   // BigInt!
+		"sender",      // Bytes!
+		"recipient",   // Bytes!
+		"amount0",     // BigDecimal!
+		"amount1",     // BigDecimal!
+		"amountUSD",   // BigDecimal
+		"amount0Paid", // BigDecimal!
+		"amount1Paid", // BigDecimal!
+		"logIndex",    // BigInt
+	},
+	reference: map[string]string{
+		"transaction": "transaction", // Transaction!
+		"pool":        "pool",        // Pool!
+	},
+}
+
+type UniswapDayDataResponse struct {
+	UniswapDayData UniswapDayData
+}
+
+type ListUniswapDayDatasResponse struct {
+	UniswapDayDatas []UniswapDayData
+}
+
+type UniswapDayData struct {
+	ID                 string
+	Date               string
+	VolumeETH          string
+	VolumeUSD          string
+	VolumeUSDUntracked string
+	FeesUSD            string
+	TxCount            string
+	TvlUSD             string
+}
+
+var UniswapDayDataFields modelFields = modelFields{
+	name: "uniswapDayData",
+	direct: []string{
+		"id",                 // ID!
+		"date",               // Int!
+		"volumeETH",          // BigDecimal!
+		"volumeUSD",          // BigDecimal!
+		"volumeUSDUntracked", // BigDecimal!
+		"feesUSD",            // BigDecimal!
+		"txCount",            // BigInt!
+		"tvlUSD",             // BigDecimal!
+	},
+}
+
+type PoolDayDataResponse struct {
+	PoolDayData PoolDayData
+}
+
+type ListPoolDayDatasResponse struct {
+	PoolDayDatas []PoolDayData
+}
+
+type PoolDayData struct {
+	ID                   string
+	Date                 string
+	Pool                 Pool
+	Liquidity            string
+	SqrtPrice            string
+	Token0Price          string
+	Token1Price          string
+	Tick                 string
+	FeeGrowthGlobal0X128 string
+	FeeGrowthGlobal1X128 string
+	TvlUSD               string
+	VolumeToken0         string
+	VolumeToken1         string
+	VolumeUSD            string
+	FeesUSD              string
+	TxCount              string
+	Open                 string
+	High                 string
+	Low                  string
+	Close                string
+}
+
+var PoolDayDataFields modelFields = modelFields{
+	name: "poolDayData",
+	direct: []string{
+		"id",                   // ID!
+		"date",                 // Int!
+		"liquidity",            // BigInt!
+		"sqrtPrice",            // BigInt!
+		"token0Price",          // BigDecimal!
+		"token1Price",          // BigDecimal!
+		"tick",                 // BigInt
+		"feeGrowthGlobal0X128", // BigInt!
+		"feeGrowthGlobal1X128", // BigInt!
+		"tvlUSD",               // BigDecimal!
+		"volumeToken0",         // BigDecimal!
+		"volumeToken1",         // BigDecimal!
+		"volumeUSD",            // BigDecimal!
+		"feesUSD",              // BigDecimal!
+		"txCount",              // BigInt!
+		"open",                 // BigDecimal!
+		"high",                 // BigDecimal!
+		"low",                  // BigDecimal!
+		"close",                // BigDecimal!
+	},
+	reference: map[string]string{
+		"pool": "pool", // Pool!
+	},
+}
+
+type PoolHourDataResponse struct {
+	PoolHourData PoolHourData
+}
+
+type ListPoolHourDatasResponse struct {
+	PoolHourDatas []PoolHourData
+}
+
+type PoolHourData struct {
+	ID                   string
+	PeriodStartUnix      string
+	Pool                 Pool
+	Liquidity            string
+	SqrtPrice            string
+	Token0Price          string
+	Token1Price          string
+	Tick                 string
+	FeeGrowthGlobal0X128 string
+	FeeGrowthGlobal1X128 string
+	TvlUSD               string
+	VolumeToken0         string
+	VolumeToken1         string
+	VolumeUSD            string
+	FeesUSD              string
+	TxCount              string
+	Open                 string
+	High                 string
+	Low                  string
+	Close                string
+}
+
+var PoolHourDataFields modelFields = modelFields{
+	name: "poolHourData",
+	direct: []string{
+		"id",                   // ID!
+		"periodStartUnix",      // Int!
+		"liquidity",            // BigInt!
+		"sqrtPrice",            // BigInt!
+		"token0Price",          // BigDecimal!
+		"token1Price",          // BigDecimal!
+		"tick",                 // BigInt
+		"feeGrowthGlobal0X128", // BigInt!
+		"feeGrowthGlobal1X128", // BigInt!
+		"tvlUSD",               // BigDecimal!
+		"volumeToken0",         // BigDecimal!
+		"volumeToken1",         // BigDecimal!
+		"volumeUSD",            // BigDecimal!
+		"feesUSD",              // BigDecimal!
+		"txCount",              // BigInt!
+		"open",                 // BigDecimal!
+		"high",                 // BigDecimal!
+		"low",                  // BigDecimal!
+		"close",                // BigDecimal!
+	},
+	reference: map[string]string{
+		"pool": "pool", // Pool!
+	},
+}
+
+type TickHourDataResponse struct {
+	TickHourData TickHourData
+}
+
+type ListTickHourDatasResponse struct {
+	TickHourDatas []TickHourData
+}
+
+type TickHourData struct {
+	ID              string
+	PeriodStartUnix string
+	Pool            Pool
+	Tick            Tick
+	LiquidityGross  string
+	LiquidityNet    string
+	VolumeToken0    string
+	VolumeToken1    string
+	VolumeUSD       string
+	FeesUSD         string
+}
+
+var TickHourDataFields modelFields = modelFields{
+	name: "tickHourData",
+	direct: []string{
+		"id",              // ID!
+		"periodStartUnix", // Int!
+		"liquidityGross",  // BigInt!
+		"liquidityNet",    // BigInt!
+		"volumeToken0",    // BigDecimal!
+		"volumeToken1",    // BigDecimal!
+		"volumeUSD",       // BigDecimal!
+		"feesUSD",         // BigDecimal!
+	},
+	reference: map[string]string{
+		"pool": "pool", // Pool!
+		"tick": "tick", // Tick!
+	},
+}
+
+type TickDayDataResponse struct {
+	TickDayData TickDayData
+}
+
+type ListTickDayDatasResponse struct {
+	TickDayDatas []TickDayData
+}
+
+type TickDayData struct {
+	ID                    string
+	Date                  string
+	Pool                  Pool
+	Tick                  Tick
+	LiquidityGross        string
+	LiquidityNet          string
+	VolumeToken0          string
+	VolumeToken1          string
+	VolumeUSD             string
+	FeesUSD               string
+	FeeGrowthOutside0X128 string
+	FeeGrowthOutside1X128 string
+}
+
+var TickDayDataFields modelFields = modelFields{
+	name: "tickDayData",
+	direct: []string{
+		"id",                    // ID!
+		"date",                  // Int!
+		"liquidityGross",        // BigInt!
+		"liquidityNet",          // BigInt!
+		"volumeToken0",          // BigDecimal!
+		"volumeToken1",          // BigDecimal!
+		"volumeUSD",             // BigDecimal!
+		"feesUSD",               // BigDecimal!
+		"feeGrowthOutside0X128", // BigInt!
+		"feeGrowthOutside1X128", // BigInt!
+	},
+	reference: map[string]string{
+		"pool": "pool", // Pool!
+		"tick": "tick", // Tick!
+	},
+}
+
+type TokenDayDataResponse struct {
+	TokenDayData TokenDayData
+}
+
+type ListTokenDayDatasResponse struct {
+	TokenDayDatas []TokenDayData
+}
+
+type TokenDayData struct {
+	ID                  string
+	Date                string
+	Token               Token
+	Volume              string
+	VolumeUSD           string
+	UntrackedVolumeUSD  string
+	TotalValueLocked    string
+	TotalValueLockedUSD string
+	PriceUSD            string
+	FeesUSD             string
+	Open                string
+	High                string
+	Low                 string
+	Close               string
+}
+
+var TokenDayDataFields modelFields = modelFields{
+	name: "tokenDayData",
+	direct: []string{
+		"id",                  // ID!
+		"date",                // Int!
+		"volume",              // BigDecimal!
+		"volumeUSD",           // BigDecimal!
+		"untrackedVolumeUSD",  // BigDecimal!
+		"totalValueLocked",    // BigDecimal!
+		"totalValueLockedUSD", // BigDecimal!
+		"priceUSD",            // BigDecimal!
+		"feesUSD",             // BigDecimal!
+		"open",                // BigDecimal!
+		"high",                // BigDecimal!
+		"low",                 // BigDecimal!
+		"close",               // BigDecimal!
+	},
+	reference: map[string]string{
+		"token": "token", // Token!
+	},
+}
+
+type TokenHourDataResponse struct {
+	TokenHourData TokenHourData
+}
+
+type ListTokenHourDatasResponse struct {
+	TokenHourDatas []TokenHourData
+}
+
+type TokenHourData struct {
+	ID                  string
+	PeriodStartUnix     string
+	Token               Token
+	Volume              string
+	VolumeUSD           string
+	UntrackedVolumeUSD  string
+	TotalValueLocked    string
+	TotalValueLockedUSD string
+	PriceUSD            string
+	FeesUSD             string
+	Open                string
+	High                string
+	Low                 string
+	Close               string
+}
+
+var TokenHourDataFields modelFields = modelFields{
+	name: "tokenHourData",
+	direct: []string{
+		"id",                  // ID!
+		"periodStartUnix",     // Int!
+		"volume",              // BigDecimal!
+		"volumeUSD",           // BigDecimal!
+		"untrackedVolumeUSD",  // BigDecimal!
+		"totalValueLocked",    // BigDecimal!
+		"totalValueLockedUSD", // BigDecimal!
+		"priceUSD",            // BigDecimal!
+		"feesUSD",             // BigDecimal!
+		"open",                // BigDecimal!
+		"high",                // BigDecimal!
+		"low",                 // BigDecimal!
+		"close",               // BigDecimal!
+	},
+	reference: map[string]string{
+		"token": "token", // Token!
 	},
 }
