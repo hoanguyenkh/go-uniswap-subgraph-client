@@ -18,6 +18,18 @@ var modelMap map[string]modelFields = map[string]modelFields{
 	"position":         PositionFields,
 	"positionSnapshot": PositionSnapshotFields,
 	"transaction":      TransactionFields,
+	"mint":             MintFields,
+	"burn":             BurnFields,
+	"swap":             SwapFields,
+	"collect":          CollectFields,
+	"flash":            FlashFields,
+	"uniswapDayData":   UniswapDayDataFields,
+	"poolDayData":      PoolDayDataFields,
+	"poolHourData":     PoolHourDataFields,
+	"tickHourData":     TickHourDataFields,
+	"tickDayData":      TickDayDataFields,
+	"tokenDayData":     TokenDayDataFields,
+	"tokenHourData":    TokenHourDataFields,
 }
 
 type FactoryResponse struct {
@@ -29,19 +41,19 @@ type ListFactoriesResponse struct {
 }
 
 type Factory struct {
-	ID                           string
-	PoolCount                    string
-	TxCount                      string
-	TotalVolumeUSD               string
-	TotalVolumeETH               string
-	TotalFeesUSD                 string
-	TotalFeesETH                 string
-	UntrackedVolumeUSD           string
-	TotalValueLockedUSD          string
-	TotalValueLockedETH          string
-	TotalValueLockedUSDUntracked string
-	TotalValueLockedETHUntracked string
-	Owner                        string
+	ID                           string `json:"id"`
+	PoolCount                    string `json:"poolCount"`
+	TxCount                      string `json:"txCount"`
+	TotalVolumeUSD               string `json:"totalVolumeUSD"`
+	TotalVolumeETH               string `json:"totalVolumeETH"`
+	TotalFeesUSD                 string `json:"totalFeesUSD"`
+	TotalFeesETH                 string `json:"totalFeesETH"`
+	UntrackedVolumeUSD           string `json:"untrackedVolumeUSD"`
+	TotalValueLockedUSD          string `json:"totalValueLockedUSD"`
+	TotalValueLockedETH          string `json:"totalValueLockedETH"`
+	TotalValueLockedUSDUntracked string `json:"totalValueLockedUSDUntracked"`
+	TotalValueLockedETHUntracked string `json:"totalValueLockedETHUntracked"`
+	Owner                        string `json:"owner"`
 }
 
 var FactoryFields modelFields = modelFields{
@@ -72,35 +84,35 @@ type ListPoolsResponse struct {
 }
 
 type Pool struct {
-	ID                           string
-	CreatedAtTimestamp           string
-	CreatedAtBlockNumber         string
-	Token0                       Token
-	Token1                       Token
-	FeeTier                      string
-	Liquidity                    string
-	SqrtPrice                    string
-	FeeGrowthGlobal0X128         string
-	FeeGrowthGlobal1X128         string
-	Token0Price                  string
-	Token1Price                  string
-	Tick                         string
-	ObservationIndex             string
-	VolumeToken0                 string
-	VolumeToken1                 string
-	VolumeUSD                    string
-	UntrackedVolumeUSD           string
-	FeesUSD                      string
-	TxCount                      string
-	CollectedFeesToken0          string
-	CollectedFeesToken1          string
-	CollectedFeesUSD             string
-	TotalValueLockedToken0       string
-	TotalValueLockedToken1       string
-	TotalValueLockedETH          string
-	TotalValueLockedUSD          string
-	TotalValueLockedUSDUntracked string
-	LiquidityProviderCount       string
+	ID                           string `json:"id"`
+	CreatedAtTimestamp           string `json:"createdAtTimestamp"`
+	CreatedAtBlockNumber         string `json:"createdAtBlockNumber"`
+	Token0                       Token  `json:"token0"`
+	Token1                       Token  `json:"token1"`
+	FeeTier                      string `json:"feeTier"`
+	Liquidity                    string `json:"liquidity"`
+	SqrtPrice                    string `json:"sqrtPrice"`
+	FeeGrowthGlobal0X128         string `json:"feeGrowthGlobal0X128"`
+	FeeGrowthGlobal1X128         string `json:"feeGrowthGlobal1X128"`
+	Token0Price                  string `json:"token0Price"`
+	Token1Price                  string `json:"token1Price"`
+	Tick                         string `json:"tick"`
+	ObservationIndex             string `json:"observationIndex"`
+	VolumeToken0                 string `json:"volumeToken0"`
+	VolumeToken1                 string `json:"volumeToken1"`
+	VolumeUSD                    string `json:"volumeUSD"`
+	UntrackedVolumeUSD           string `json:"untrackedVolumeUSD"`
+	FeesUSD                      string `json:"feesUSD"`
+	TxCount                      string `json:"txCount"`
+	CollectedFeesToken0          string `json:"collectedFeesToken0"`
+	CollectedFeesToken1          string `json:"collectedFeesToken1"`
+	CollectedFeesUSD             string `json:"collectedFeesUSD"`
+	TotalValueLockedToken0       string `json:"totalValueLockedToken0"`
+	TotalValueLockedToken1       string `json:"totalValueLockedToken1"`
+	TotalValueLockedETH          string `json:"totalValueLockedETH"`
+	TotalValueLockedUSD          string `json:"totalValueLockedUSD"`
+	TotalValueLockedUSDUntracked string `json:"totalValueLockedUSDUntracked"`
+	LiquidityProviderCount       string `json:"liquidityProviderCount"`
 }
 
 var PoolFields modelFields = modelFields{
@@ -149,21 +161,21 @@ type ListTokensResponse struct {
 }
 
 type Token struct {
-	ID                           string
-	Symbol                       string
-	Name                         string
-	Decimals                     string
-	TotalSupply                  string
-	Volume                       string
-	VolumeUSD                    string
-	UntrackedVolumeUSD           string
-	FeesUSD                      string
-	TxCount                      string
-	PoolCount                    string
-	TotalValueLocked             string
-	TotalValueLockedUSD          string
-	TotalValueLockedUSDUntracked string
-	DerivedETH                   string
+	ID                           string `json:"id"`
+	Symbol                       string `json:"symbol"`
+	Name                         string `json:"name"`
+	Decimals                     string `json:"decimals"`
+	TotalSupply                  string `json:"totalSupply"`
+	Volume                       string `json:"volume"`
+	VolumeUSD                    string `json:"volumeUSD"`
+	UntrackedVolumeUSD           string `json:"untrackedVolumeUSD"`
+	FeesUSD                      string `json:"feesUSD"`
+	TxCount                      string `json:"txCount"`
+	PoolCount                    string `json:"poolCount"`
+	TotalValueLocked             string `json:"totalValueLocked"`
+	TotalValueLockedUSD          string `json:"totalValueLockedUSD"`
+	TotalValueLockedUSDUntracked string `json:"totalValueLockedUSDUntracked"`
+	DerivedETH                   string `json:"derivedETH"`
 }
 
 var TokenFields modelFields = modelFields{
@@ -199,8 +211,8 @@ type ListBundlesResponse struct {
 }
 
 type Bundle struct {
-	ID          string
-	EthPriceUSD string
+	ID          string `json:"id"`
+	EthPriceUSD string `json:"ethPriceUSD"`
 }
 
 var BundleFields modelFields = modelFields{
@@ -220,27 +232,27 @@ type ListTicksResponse struct {
 }
 
 type Tick struct {
-	ID                     string
-	PoolAddress            string
-	TickIdx                string
-	Pool                   Pool
-	LiquidityGross         string
-	LiquidityNet           string
-	Price0                 string
-	Price1                 string
-	VolumeToken0           string
-	VolumeToken1           string
-	VolumeUSD              string
-	UntrackedVolumeUSD     string
-	FeesUSD                string
-	CollectedFeesToken0    string
-	CollectedFeesToken1    string
-	CollectedFeesUSD       string
-	CreatedAtTimestamp     string
-	CreatedAtBlockNumber   string
-	LiquidityProviderCount string
-	FeeGrowthOutside0X128  string
-	FeeGrowthOutside1X128  string
+	ID                     string `json:"id"`
+	PoolAddress            string `json:"poolAddress"`
+	TickIdx                string `json:"tickIdx"`
+	Pool                   Pool   `json:"pool"`
+	LiquidityGross         string `json:"liquidityGross"`
+	LiquidityNet           string `json:"liquidityNet"`
+	Price0                 string `json:"price0"`
+	Price1                 string `json:"price1"`
+	VolumeToken0           string `json:"volumeToken0"`
+	VolumeToken1           string `json:"volumeToken1"`
+	VolumeUSD              string `json:"volumeUSD"`
+	UntrackedVolumeUSD     string `json:"untrackedVolumeUSD"`
+	FeesUSD                string `json:"feesUSD"`
+	CollectedFeesToken0    string `json:"collectedFeesToken0"`
+	CollectedFeesToken1    string `json:"collectedFeesToken1"`
+	CollectedFeesUSD       string `json:"collectedFeesUSD"`
+	CreatedAtTimestamp     string `json:"createdAtTimestamp"`
+	CreatedAtBlockNumber   string `json:"createdAtBlockNumber"`
+	LiquidityProviderCount string `json:"liquidityProviderCount"`
+	FeeGrowthOutside0X128  string `json:"feeGrowthOutside0X128"`
+	FeeGrowthOutside1X128  string `json:"feeGrowthOutside1X128"`
 }
 
 var TickFields modelFields = modelFields{
@@ -281,23 +293,23 @@ type ListPositionsResponse struct {
 }
 
 type Position struct {
-	ID                       string
-	Owner                    string
-	Pool                     Pool
-	Token0                   Token
-	Token1                   Token
-	TickLower                Tick
-	TickUpper                Tick
-	Liquidity                string
-	DepositedToken0          string
-	DepositedToken1          string
-	WithdrawnToken0          string
-	WithdrawnToken1          string
-	CollectedFeesToken0      string
-	CollectedFeesToken1      string
-	Transaction              Transaction
-	FeeGrowthInside0LastX128 string
-	FeeGrowthInside1LastX128 string
+	ID                       string      `json:"id"`
+	Owner                    string      `json:"owner"`
+	Pool                     Pool        `json:"pool"`
+	Token0                   Token       `json:"token0"`
+	Token1                   Token       `json:"token1"`
+	TickLower                Tick        `json:"tickLower"`
+	TickUpper                Tick        `json:"tickUpper"`
+	Liquidity                string      `json:"liquidity"`
+	DepositedToken0          string      `json:"depositedToken0"`
+	DepositedToken1          string      `json:"depositedToken1"`
+	WithdrawnToken0          string      `json:"withdrawnToken0"`
+	WithdrawnToken1          string      `json:"withdrawnToken1"`
+	CollectedFeesToken0      string      `json:"collectedFeesToken0"`
+	CollectedFeesToken1      string      `json:"collectedFeesToken1"`
+	Transaction              Transaction `json:"transaction"`
+	FeeGrowthInside0LastX128 string      `json:"feeGrowthInside0LastX128"`
+	FeeGrowthInside1LastX128 string      `json:"feeGrowthInside1LastX128"`
 }
 
 var PositionFields modelFields = modelFields{
@@ -334,22 +346,22 @@ type ListPositionSnapshotsResponse struct {
 }
 
 type PositionSnapshot struct {
-	ID                       string
-	Owner                    string
-	Pool                     Pool
-	Position                 Position
-	BlockNumber              string
-	Timestamp                string
-	Liquidity                string
-	DepositedToken0          string
-	DepositedToken1          string
-	WithdrawnToken0          string
-	WithdrawnToken1          string
-	CollectedFeesToken0      string
-	CollectedFeesToken1      string
-	Transaction              Transaction
-	FeeGrowthInside0LastX128 string
-	FeeGrowthInside1LastX128 string
+	ID                       string      `json:"id"`
+	Owner                    string      `json:"owner"`
+	Pool                     Pool        `json:"pool"`
+	Position                 Position    `json:"position"`
+	BlockNumber              string      `json:"blockNumber"`
+	Timestamp                string      `json:"timestamp"`
+	Liquidity                string      `json:"liquidity"`
+	DepositedToken0          string      `json:"depositedToken0"`
+	DepositedToken1          string      `json:"depositedToken1"`
+	WithdrawnToken0          string      `json:"withdrawnToken0"`
+	WithdrawnToken1          string      `json:"withdrawnToken1"`
+	CollectedFeesToken0      string      `json:"collectedFeesToken0"`
+	CollectedFeesToken1      string      `json:"collectedFeesToken1"`
+	Transaction              Transaction `json:"transaction"`
+	FeeGrowthInside0LastX128 string      `json:"feeGrowthInside0LastX128"`
+	FeeGrowthInside1LastX128 string      `json:"feeGrowthInside1LastX128"`
 }
 
 var PositionSnapshotFields modelFields = modelFields{
@@ -385,11 +397,11 @@ type ListTransactionsResponse struct {
 }
 
 type Transaction struct {
-	ID          string
-	BlockNumber string
-	Timestamp   string
-	GasUsed     string
-	GasPrice    string
+	ID          string `json:"id"`
+	BlockNumber string `json:"blockNumber"`
+	Timestamp   string `json:"timestamp"`
+	GasUsed     string `json:"gasUsed"`
+	GasPrice    string `json:"gasPrice"`
 }
 
 var TransactionFields modelFields = modelFields{
@@ -412,22 +424,22 @@ type ListMintsResponse struct {
 }
 
 type Mint struct {
-	ID          string
-	Transaction Transaction
-	Timestamp   string
-	Pool        Pool
-	Token0      Token
-	Token1      Token
-	Owner       string
-	Sender      string
-	Origin      string
-	Amount      string
-	Amount0     string
-	Amount1     string
-	AmountUSD   string
-	TickLower   string
-	TickUpper   string
-	LogIndex    string
+	ID          string      `json:"id"`
+	Transaction Transaction `json:"transaction"`
+	Timestamp   string      `json:"timestamp"`
+	Pool        Pool        `json:"pool"`
+	Token0      Token       `json:"token0"`
+	Token1      Token       `json:"token1"`
+	Owner       string      `json:"owner"`
+	Sender      string      `json:"sender"`
+	Origin      string      `json:"origin"`
+	Amount      string      `json:"amount"`
+	Amount0     string      `json:"amount0"`
+	Amount1     string      `json:"amount1"`
+	AmountUSD   string      `json:"amountUSD"`
+	TickLower   string      `json:"tickLower"`
+	TickUpper   string      `json:"tickUpper"`
+	LogIndex    string      `json:"logIndex"`
 }
 
 var MintFields modelFields = modelFields{
@@ -463,21 +475,21 @@ type ListBurnsResponse struct {
 }
 
 type Burn struct {
-	ID          string
-	Transaction Transaction
-	Pool        Pool
-	Token0      Token
-	Token1      Token
-	Timestamp   string
-	Owner       string
-	Origin      string
-	Amount      string
-	Amount0     string
-	Amount1     string
-	AmountUSD   string
-	TickLower   string
-	TickUpper   string
-	LogIndex    string
+	ID          string      `json:"id"`
+	Transaction Transaction `json:"transaction"`
+	Pool        Pool        `json:"pool"`
+	Token0      Token       `json:"token0"`
+	Token1      Token       `json:"token1"`
+	Timestamp   string      `json:"timestamp"`
+	Owner       string      `json:"owner"`
+	Origin      string      `json:"origin"`
+	Amount      string      `json:"amount"`
+	Amount0     string      `json:"amount0"`
+	Amount1     string      `json:"amount1"`
+	AmountUSD   string      `json:"amountUSD"`
+	TickLower   string      `json:"tickLower"`
+	TickUpper   string      `json:"tickUpper"`
+	LogIndex    string      `json:"logIndex"`
 }
 
 var BurnFields modelFields = modelFields{
@@ -512,21 +524,21 @@ type ListSwapsResponse struct {
 }
 
 type Swap struct {
-	ID           string
-	Transaction  Transaction
-	Timestamp    string
-	Pool         Pool
-	Token0       Token
-	Token1       Token
-	Sender       string
-	Recipient    string
-	Origin       string
-	Amount0      string
-	Amount1      string
-	AmountUSD    string
-	SqrtPriceX96 string
-	Tick         string
-	LogIndex     string
+	ID           string      `json:"id"`
+	Transaction  Transaction `json:"transaction"`
+	Timestamp    string      `json:"timestamp"`
+	Pool         Pool        `json:"pool"`
+	Token0       Token       `json:"token0"`
+	Token1       Token       `json:"token1"`
+	Sender       string      `json:"sender"`
+	Recipient    string      `json:"recipient"`
+	Origin       string      `json:"origin"`
+	Amount0      string      `json:"amount0"`
+	Amount1      string      `json:"amount1"`
+	AmountUSD    string      `json:"amountUSD"`
+	SqrtPriceX96 string      `json:"sqrtPriceX96"`
+	Tick         string      `json:"tick"`
+	LogIndex     string      `json:"logIndex"`
 }
 
 var SwapFields modelFields = modelFields{
@@ -561,17 +573,17 @@ type ListCollectsResponse struct {
 }
 
 type Collect struct {
-	ID          string
-	Transaction Transaction
-	Timestamp   string
-	Pool        Pool
-	Owner       string
-	Amount0     string
-	Amount1     string
-	AmountUSD   string
-	TickLower   string
-	TickUpper   string
-	LogIndex    string
+	ID          string      `json:"id"`
+	Transaction Transaction `json:"transaction"`
+	Timestamp   string      `json:"timestamp"`
+	Pool        Pool        `json:"pool"`
+	Owner       string      `json:"owner"`
+	Amount0     string      `json:"amount0"`
+	Amount1     string      `json:"amount1"`
+	AmountUSD   string      `json:"amountUSD"`
+	TickLower   string      `json:"tickLower"`
+	TickUpper   string      `json:"tickUpper"`
+	LogIndex    string      `json:"logIndex"`
 }
 
 var CollectFields modelFields = modelFields{
@@ -602,18 +614,18 @@ type ListFlashesResponse struct {
 }
 
 type Flash struct {
-	ID          string
-	Transaction Transaction
-	Timestamp   string
-	Pool        Pool
-	Sender      string
-	Recipient   string
-	Amount0     string
-	Amount1     string
-	AmountUSD   string
-	Amount0Paid string
-	Amount1Paid string
-	LogIndex    string
+	ID          string      `json:"id"`
+	Transaction Transaction `json:"transaction"`
+	Timestamp   string      `json:"timestamp"`
+	Pool        Pool        `json:"pool"`
+	Sender      string      `json:"sender"`
+	Recipient   string      `json:"recipient"`
+	Amount0     string      `json:"amount0"`
+	Amount1     string      `json:"amount1"`
+	AmountUSD   string      `json:"amountUSD"`
+	Amount0Paid string      `json:"amount0Paid"`
+	Amount1Paid string      `json:"amount1Paid"`
+	LogIndex    string      `json:"logIndex"`
 }
 
 var FlashFields modelFields = modelFields{
@@ -645,14 +657,14 @@ type ListUniswapDayDatasResponse struct {
 }
 
 type UniswapDayData struct {
-	ID                 string
-	Date               string
-	VolumeETH          string
-	VolumeUSD          string
-	VolumeUSDUntracked string
-	FeesUSD            string
-	TxCount            string
-	TvlUSD             string
+	ID                 string `json:"id"`
+	Date               string `json:"date"`
+	VolumeETH          string `json:"volumeETH"`
+	VolumeUSD          string `json:"volumeUSD"`
+	VolumeUSDUntracked string `json:"volumeUSDUntracked"`
+	FeesUSD            string `json:"feesUSD"`
+	TxCount            string `json:"txCount"`
+	TvlUSD             string `json:"tvlUSD"`
 }
 
 var UniswapDayDataFields modelFields = modelFields{
@@ -678,26 +690,26 @@ type ListPoolDayDatasResponse struct {
 }
 
 type PoolDayData struct {
-	ID                   string
-	Date                 string
-	Pool                 Pool
-	Liquidity            string
-	SqrtPrice            string
-	Token0Price          string
-	Token1Price          string
-	Tick                 string
-	FeeGrowthGlobal0X128 string
-	FeeGrowthGlobal1X128 string
-	TvlUSD               string
-	VolumeToken0         string
-	VolumeToken1         string
-	VolumeUSD            string
-	FeesUSD              string
-	TxCount              string
-	Open                 string
-	High                 string
-	Low                  string
-	Close                string
+	ID                   string `json:"id"`
+	Date                 string `json:"date"`
+	Pool                 Pool   `json:"pool"`
+	Liquidity            string `json:"liquidity"`
+	SqrtPrice            string `json:"sqrtPrice"`
+	Token0Price          string `json:"token0Price"`
+	Token1Price          string `json:"token1Price"`
+	Tick                 string `json:"tick"`
+	FeeGrowthGlobal0X128 string `json:"feeGrowthGlobal0X128"`
+	FeeGrowthGlobal1X128 string `json:"feeGrowthGlobal1X128"`
+	TvlUSD               string `json:"tvlUSD"`
+	VolumeToken0         string `json:"volumeToken0"`
+	VolumeToken1         string `json:"volumeToken1"`
+	VolumeUSD            string `json:"volumeUSD"`
+	FeesUSD              string `json:"feesUSD"`
+	TxCount              string `json:"txCount"`
+	Open                 string `json:"open"`
+	High                 string `json:"high"`
+	Low                  string `json:"low"`
+	Close                string `json:"close"`
 }
 
 var PoolDayDataFields modelFields = modelFields{
@@ -737,26 +749,26 @@ type ListPoolHourDatasResponse struct {
 }
 
 type PoolHourData struct {
-	ID                   string
-	PeriodStartUnix      string
-	Pool                 Pool
-	Liquidity            string
-	SqrtPrice            string
-	Token0Price          string
-	Token1Price          string
-	Tick                 string
-	FeeGrowthGlobal0X128 string
-	FeeGrowthGlobal1X128 string
-	TvlUSD               string
-	VolumeToken0         string
-	VolumeToken1         string
-	VolumeUSD            string
-	FeesUSD              string
-	TxCount              string
-	Open                 string
-	High                 string
-	Low                  string
-	Close                string
+	ID                   string `json:"id"`
+	PeriodStartUnix      string `json:"periodStartUnix"`
+	Pool                 Pool   `json:"pool"`
+	Liquidity            string `json:"liquidity"`
+	SqrtPrice            string `json:"sqrtPrice"`
+	Token0Price          string `json:"token0Price"`
+	Token1Price          string `json:"token1Price"`
+	Tick                 string `json:"tick"`
+	FeeGrowthGlobal0X128 string `json:"feeGrowthGlobal0X128"`
+	FeeGrowthGlobal1X128 string `json:"feeGrowthGlobal1X128"`
+	TvlUSD               string `json:"tvlUSD"`
+	VolumeToken0         string `json:"volumeToken0"`
+	VolumeToken1         string `json:"volumeToken1"`
+	VolumeUSD            string `json:"volumeUSD"`
+	FeesUSD              string `json:"feesUSD"`
+	TxCount              string `json:"txCount"`
+	Open                 string `json:"open"`
+	High                 string `json:"high"`
+	Low                  string `json:"low"`
+	Close                string `json:"close"`
 }
 
 var PoolHourDataFields modelFields = modelFields{
@@ -796,16 +808,16 @@ type ListTickHourDatasResponse struct {
 }
 
 type TickHourData struct {
-	ID              string
-	PeriodStartUnix string
-	Pool            Pool
-	Tick            Tick
-	LiquidityGross  string
-	LiquidityNet    string
-	VolumeToken0    string
-	VolumeToken1    string
-	VolumeUSD       string
-	FeesUSD         string
+	ID              string `json:"id"`
+	PeriodStartUnix string `json:"periodStartUnix"`
+	Pool            Pool   `json:"pool"`
+	Tick            Tick   `json:"tick"`
+	LiquidityGross  string `json:"liquidityGross"`
+	LiquidityNet    string `json:"liquidityNet"`
+	VolumeToken0    string `json:"volumeToken0"`
+	VolumeToken1    string `json:"volumeToken1"`
+	VolumeUSD       string `json:"volumeUSD"`
+	FeesUSD         string `json:"feesUSD"`
 }
 
 var TickHourDataFields modelFields = modelFields{
@@ -835,18 +847,18 @@ type ListTickDayDatasResponse struct {
 }
 
 type TickDayData struct {
-	ID                    string
-	Date                  string
-	Pool                  Pool
-	Tick                  Tick
-	LiquidityGross        string
-	LiquidityNet          string
-	VolumeToken0          string
-	VolumeToken1          string
-	VolumeUSD             string
-	FeesUSD               string
-	FeeGrowthOutside0X128 string
-	FeeGrowthOutside1X128 string
+	ID                    string `json:"id"`
+	Date                  string `json:"date"`
+	Pool                  Pool   `json:"pool"`
+	Tick                  Tick   `json:"tick"`
+	LiquidityGross        string `json:"liquidityGross"`
+	LiquidityNet          string `json:"liquidityNet"`
+	VolumeToken0          string `json:"volumeToken0"`
+	VolumeToken1          string `json:"volumeToken1"`
+	VolumeUSD             string `json:"volumeUSD"`
+	FeesUSD               string `json:"feesUSD"`
+	FeeGrowthOutside0X128 string `json:"feeGrowthOutside0X128"`
+	FeeGrowthOutside1X128 string `json:"feeGrowthOutside1X128"`
 }
 
 var TickDayDataFields modelFields = modelFields{
@@ -878,20 +890,20 @@ type ListTokenDayDatasResponse struct {
 }
 
 type TokenDayData struct {
-	ID                  string
-	Date                string
-	Token               Token
-	Volume              string
-	VolumeUSD           string
-	UntrackedVolumeUSD  string
-	TotalValueLocked    string
-	TotalValueLockedUSD string
-	PriceUSD            string
-	FeesUSD             string
-	Open                string
-	High                string
-	Low                 string
-	Close               string
+	ID                  string `json:"id"`
+	Date                string `json:"date"`
+	Token               Token  `json:"token"`
+	Volume              string `json:"volume"`
+	VolumeUSD           string `json:"volumeUSD"`
+	UntrackedVolumeUSD  string `json:"untrackedVolumeUSD"`
+	TotalValueLocked    string `json:"totalValueLocked"`
+	TotalValueLockedUSD string `json:"totalValueLockedUSD"`
+	PriceUSD            string `json:"priceUSD"`
+	FeesUSD             string `json:"feesUSD"`
+	Open                string `json:"open"`
+	High                string `json:"high"`
+	Low                 string `json:"low"`
+	Close               string `json:"close"`
 }
 
 var TokenDayDataFields modelFields = modelFields{
@@ -925,20 +937,20 @@ type ListTokenHourDatasResponse struct {
 }
 
 type TokenHourData struct {
-	ID                  string
-	PeriodStartUnix     string
-	Token               Token
-	Volume              string
-	VolumeUSD           string
-	UntrackedVolumeUSD  string
-	TotalValueLocked    string
-	TotalValueLockedUSD string
-	PriceUSD            string
-	FeesUSD             string
-	Open                string
-	High                string
-	Low                 string
-	Close               string
+	ID                  string `json:"id"`
+	PeriodStartUnix     string `json:"periodStartUnix"`
+	Token               Token  `json:"token"`
+	Volume              string `json:"volume"`
+	VolumeUSD           string `json:"volumeUSD"`
+	UntrackedVolumeUSD  string `json:"untrackedVolumeUSD"`
+	TotalValueLocked    string `json:"totalValueLocked"`
+	TotalValueLockedUSD string `json:"totalValueLockedUSD"`
+	PriceUSD            string `json:"priceUSD"`
+	FeesUSD             string `json:"feesUSD"`
+	Open                string `json:"open"`
+	High                string `json:"high"`
+	Low                 string `json:"low"`
+	Close               string `json:"close"`
 }
 
 var TokenHourDataFields modelFields = modelFields{
