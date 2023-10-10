@@ -1,6 +1,7 @@
 package converter
 
 import (
+	"encoding/json"
 	"errors"
 	"math/big"
 )
@@ -19,4 +20,16 @@ func StringToBigFloat(s string) (*big.Float, error) {
 		return nil, errors.New("converter error: unable to convert string to big float")
 	}
 	return b, nil
+}
+
+func ModelToJsonBytes(model any) ([]byte, error) {
+	return json.Marshal(model)
+}
+
+func ModelToJsonString(model any) (string, error) {
+	bytes, err := ModelToJsonBytes(model)
+	if err != nil {
+		return "", err
+	}
+	return string(bytes), nil
 }
