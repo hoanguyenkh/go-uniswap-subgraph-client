@@ -33,7 +33,26 @@ type RequestOptions struct {
 
 // type constraint for executeRequestAndConvert
 type Response interface {
-	FactoryResponse | ListFactoriesResponse | PoolResponse | ListPoolsResponse | TokenResponse | ListTokensResponse
+	FactoryResponse | ListFactoriesResponse |
+		PoolResponse | ListPoolsResponse |
+		TokenResponse | ListTokensResponse |
+		BundleResponse | ListBundlesResponse |
+		TickResponse | ListTicksResponse |
+		PositionResponse | ListPositionsResponse |
+		PositionSnapshotResponse | ListPositionSnapshotsResponse |
+		TransactionResponse | ListTransactionsResponse |
+		MintResponse | ListMintsResponse |
+		BurnResponse | ListBurnsResponse |
+		SwapResponse | ListSwapsResponse |
+		CollectResponse | ListCollectsResponse |
+		FlashResponse | ListFlashesResponse |
+		UniswapDayDataResponse | ListUniswapDayDatasResponse |
+		PoolDayDataResponse | ListPoolDayDatasResponse |
+		PoolHourDataResponse | ListPoolHourDatasResponse |
+		TickHourDataResponse | ListTickHourDatasResponse |
+		TickDayDataResponse | ListTickDayDatasResponse |
+		TokenDayDataResponse | ListTokenDayDatasResponse |
+		TokenHourDataResponse | ListTokenHourDatasResponse
 }
 
 // intermediate struct used to construct queries
