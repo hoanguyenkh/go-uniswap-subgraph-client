@@ -94,7 +94,7 @@ func assembleQuery(queryType QueryType, model modelFields, opts *RequestOptions)
 	switch queryType {
 	case ById:
 		parts = []string{
-			fmt.Sprintf("query %s($id: String!) {", model.name),
+			fmt.Sprintf("query %s($id: ID!) {", model.name),
 			fmt.Sprintf("	%s(id: $id%s) {", model.name, blockSubstr),
 		}
 	case List:
