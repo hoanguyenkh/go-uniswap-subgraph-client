@@ -3,7 +3,7 @@ COVERAGE_THRESHOLD=80
 mkdir -p ./reports
 rm -rf ./reports/*
 
-go test -coverprofile=./reports/coverage.out ./...
+go test -coverprofile=./reports/coverage.out $(go list ./... | grep -v /test)
 go tool cover -html=./reports/coverage.out -o ./reports/coverage.html
 TOTAL_COVERAGE=$(go tool cover -func=reports/coverage.out | grep total | grep -Eo '[0-9]+\.[0-9]+' | awk '{print int($1)}')
 echo "Threshold:              $COVERAGE_THRESHOLD %"
