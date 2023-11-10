@@ -68,3 +68,29 @@ const (
 	ById QueryType = iota
 	List
 )
+
+// endpoints enum
+type Endpoint int
+
+const (
+	Ethereum Endpoint = iota
+	Arbitrum
+	Optimism
+	Polygon
+	Celo
+	Bnb
+	Base
+	Avalanche
+)
+
+// endpoints map (values from https://github.com/Uniswap/v3-info/blob/master/src/apollo/client.ts)
+var Endpoints map[Endpoint]string = map[Endpoint]string{
+	Ethereum:  "https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3",
+	Arbitrum:  "https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-arbitrum-one",
+	Optimism:  "https://api.thegraph.com/subgraphs/name/ianlapham/optimism-post-regenesis",
+	Polygon:   "https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-polygon",
+	Celo:      "https://api.thegraph.com/subgraphs/name/jesse-sawa/uniswap-celo",
+	Bnb:       "https://api.thegraph.com/subgraphs/name/ianlapham/uniswap-v3-bsc",
+	Base:      "https://api.studio.thegraph.com/query/48211/uniswap-v3-base/version/latest",
+	Avalanche: "https://api.thegraph.com/subgraphs/name/lynnshaoyu/uniswap-v3-avax",
+}
