@@ -11,9 +11,9 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var endpoint string = unigraphclient.Endpoints[unigraphclient.Ethereum]
-
 func TestUniswapExampleQueries(t *testing.T) {
+	var endpoint string = unigraphclient.Endpoints[unigraphclient.Ethereum]
+
 	t.Run("current global data query (factory by id)", func(t *testing.T) {
 		factoryId := "0x1F98431c8aD98523631AE4a59f267346ea31F984"
 		client := unigraphclient.NewClient(endpoint, nil)
