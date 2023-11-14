@@ -14,6 +14,7 @@ $ go get github.com/emersonmacro/go-uniswap-subgraph-client
 import (
   "context"
   "fmt"
+
   unigraphclient "github.com/emersonmacro/go-uniswap-subgraph-client"
 )
 
@@ -105,7 +106,7 @@ client := unigraphclient.NewClient("https://<my graphql host>", nil)
 
 For convenience, you can also use one of the provided endpoints, which are the same as the endpoints used in the [Uniswap Info](https://info.uniswap.org/#/) site:
 
-```
+```go
 // e.g.:
 endpoint := unigraphclient.Endpoints[unigraphclient.Ethereum] // https://api.thegraph.com/subgraphs/name/uniswap/uniswap-v3
 // or
