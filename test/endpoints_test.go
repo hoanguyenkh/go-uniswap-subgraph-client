@@ -43,12 +43,14 @@ func TestEndpoints(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			ctx := context.Background()
 			client := unigraphclient.NewClient(test.endpoint, nil)
+
 			reqOpts := &unigraphclient.RequestOptions{
 				IncludeFields: []string{"*"},
 				ExcludeFields: []string{"feeGrowthGlobal0X128", "feeGrowthGlobal1X128"},
 				First:         5,
 			}
 			resp, err := client.ListPools(ctx, reqOpts)
+
 			assert.Nil(t, err)
 			assert.True(t, len(resp.Pools) > 0)
 		})
