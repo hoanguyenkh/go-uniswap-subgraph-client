@@ -24,6 +24,7 @@ type ClientOptions struct {
 type RequestOptions struct {
 	IncludeFields []string // fields to include in the query. '*' is a valid option meaning 'include all fields'. if any fields are listed in IncludeFields besides '*', ExcludeFields must be empty.
 	ExcludeFields []string // fields to exclude from the query. only valid when '*' is in IncludeFields.
+	Id            string   // query for data by id.
 	Block         int      // query for data at a specific block number.
 	First         int      // number of results to retrieve. `100` is the default. only valid for List queries.
 	Skip          int      // number of results to skip. `0` is the default. only valid for List queries.

@@ -56,6 +56,14 @@ func (c *Client) GetPoolById(ctx context.Context, id string, opts *RequestOption
 	return executeRequestAndConvert(ctx, req, PoolResponse{}, c)
 }
 
+func (c *Client) GetSwapHistoryByPoolId(ctx context.Context, poolId string, opts *RequestOptions) (*ListSwapsResponse, error) {
+	req, err := constructListQueryWithId(poolId, SwapFields, opts)
+	if err != nil {
+		return nil, err
+	}
+	return executeRequestAndConvert(ctx, req, ListSwapsResponse{}, c)
+}
+
 func (c *Client) ListPools(ctx context.Context, opts *RequestOptions) (*ListPoolsResponse, error) {
 	req, err := constructListQuery(PoolFields, opts)
 	if err != nil {

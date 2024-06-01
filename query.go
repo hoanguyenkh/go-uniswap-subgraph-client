@@ -82,6 +82,71 @@ func constructListQuery(model modelFields, opts *RequestOptions) (*graphql.Reque
 	return req, nil
 }
 
+func constructListQueryWithId(pool string, model modelFields, opts *RequestOptions) (*graphql.Request, error) {
+	if opts == nil {
+		opts = &RequestOptions{
+			IncludeFields: []string{"*"},
+		}
+	}
+
+	err := validateRequestOpts(List, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if slices.Contains(opts.IncludeFields, "*") {
+		fields, err := gatherModelFields(model, opts.ExcludeFields, true)
+		if err != nil {
+			return nil, err
+		}
+		opts.IncludeFields = fields
+	}
+
+	query, err := assembleQueryWithPoolId(List, model, opts)
+	if err != nil {
+		return nil, err
+	}
+	req := graphql.NewRequest(query)
+	req.Var("pool", pool)
+	req.Var("first", opts.First)
+	req.Var("skip", opts.Skip)
+	req.Var("orderBy", opts.OrderBy)
+	req.Var("orderDir", opts.OrderDir)
+
+	fmt.Println("*** DEBUG req.Query() ***")
+	fmt.Println(req.Query())
+	fmt.Println("*************")
+
+	return req, nil
+}
+
+func generateSwapsQuery(pairId string, first int, orderBy string, orderDirection string) string {
+	return fmt.Sprintf(`
+	query swaps($pairId: String, $first: Int = %d, $orderBy: String = "%s", $orderDirection: String = "%s") {
+		swaps(where: { pool: $pairId }, first: $first, orderBy: $orderBy, orderDirection: $orderDirection) {
+			id
+			timestamp
+			amount0
+			amount1
+			amountUSD
+
+			pool {
+				token0 {
+					id
+					symbol
+				}
+				token1 {
+					id
+					symbol
+				}
+			}
+			transaction {
+				id
+			}
+		}
+	}`, first, orderBy, orderDirection)
+}
+
 // assembles a properly formatted graphql query based on the provided includeFields
 func assembleQuery(queryType QueryType, model modelFields, opts *RequestOptions) (string, error) {
 	var parts []string
@@ -101,6 +166,100 @@ func assembleQuery(queryType QueryType, model modelFields, opts *RequestOptions)
 		parts = []string{
 			fmt.Sprintf("query %s($first: Int!, $skip: Int!, $orderBy: String!, $orderDir: String!) {", pluralizeModelName(model.name)),
 			fmt.Sprintf("	%s(first: $first, skip: $skip, orderBy: $orderBy, orderDirection: $orderDir%s) {", pluralizeModelName(model.name), blockSubstr),
+		}
+	default:
+		return "", fmt.Errorf("unrecognized query type (%v)", queryType)
+	}
+
+	var refFieldMap map[string]fieldRefs = make(map[string]fieldRefs)
+
+	// TODO: think about ways to make the rest of this function more comprehensible
+	for _, field := range opts.IncludeFields {
+		isRef := false
+		for k, v := range model.reference {
+			prefix := fmt.Sprintf("%s.", k)
+			if strings.HasPrefix(field, prefix) {
+				isRef = true
+				refModel, ok := modelMap[v]
+				if !ok {
+					return "", fmt.Errorf("reference field not found (%s)", k)
+				}
+				fieldWithoutPrefix := cutPrefix(field, prefix)
+				fieldRef := refFieldMap[k]
+				if strings.Contains(fieldWithoutPrefix, ".") {
+					subRefFields := strings.Split(fieldWithoutPrefix, ".")
+					subRefModel, ok := modelMap[refModel.reference[subRefFields[0]]]
+					if !ok {
+						return "", fmt.Errorf("sub-reference field not found (%s)", fieldWithoutPrefix)
+					}
+					if !validateField(subRefModel, subRefFields[1]) {
+						return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
+					}
+					fieldRef.refs = append(fieldRef.refs, fieldWithoutPrefix)
+				} else {
+					if !validateField(refModel, fieldWithoutPrefix) {
+						return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
+					}
+					fieldRef.directs = append(fieldRef.directs, fieldWithoutPrefix)
+				}
+				refFieldMap[k] = fieldRef
+				break
+			}
+		}
+		if !isRef {
+			if !validateField(model, field) {
+				return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
+			}
+			parts = append(parts, fmt.Sprintf("		%s", field))
+		}
+	}
+
+	for k, v := range refFieldMap {
+		parts = append(parts, fmt.Sprintf("		%s {", k))
+		if len(v.directs) > 0 {
+			parts = append(parts, "			"+strings.Join(v.directs, "\n			"))
+		}
+		subRefMap := make(map[string][]string)
+		for _, ref := range v.refs {
+			fieldSplit := strings.Split(ref, ".")
+			if len(fieldSplit) < 2 {
+				return "", fmt.Errorf("error parsing reference field (%s)", ref)
+			}
+			parent := fieldSplit[0]
+			child := fieldSplit[1]
+			subRefMap[parent] = append(subRefMap[parent], child)
+		}
+		for subK, subV := range subRefMap {
+			parts = append(parts, fmt.Sprintf("			%s {", subK), "				"+strings.Join(subV, "\n				"), "			}")
+		}
+		parts = append(parts, "		}")
+	}
+
+	parts = append(parts, "	}", "}")
+	query := strings.Join(parts, "\n")
+
+	return query, nil
+}
+
+// assembles a properly formatted graphql query based on the provided includeFields
+func assembleQueryWithPoolId(queryType QueryType, model modelFields, opts *RequestOptions) (string, error) {
+	var parts []string
+
+	var blockSubstr string = ""
+	if opts.Block != 0 {
+		blockSubstr = fmt.Sprintf(", block: {number: %d}", opts.Block)
+	}
+
+	switch queryType {
+	case ById:
+		parts = []string{
+			fmt.Sprintf("query %s($id: ID!) {", model.name),
+			fmt.Sprintf("	%s(id: $id%s) {", model.name, blockSubstr),
+		}
+	case List:
+		parts = []string{
+			fmt.Sprintf("query %s($pool: ID!, $first: Int!, $skip: Int!, $orderBy: String!, $orderDir: String!) {", pluralizeModelName(model.name)),
+			fmt.Sprintf("	%s(pool: $pool, first: $first, skip: $skip, orderBy: $orderBy, orderDirection: $orderDir%s) {", pluralizeModelName(model.name), blockSubstr),
 		}
 	default:
 		return "", fmt.Errorf("unrecognized query type (%v)", queryType)

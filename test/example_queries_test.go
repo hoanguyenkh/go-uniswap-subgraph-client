@@ -4,6 +4,8 @@ package test
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"testing"
 
 	unigraphclient "github.com/emersonmacro/go-uniswap-subgraph-client"
@@ -221,5 +223,29 @@ func TestUniswapExampleQueries(t *testing.T) {
 		assert.NotEqual(t, "", resp.Position.CollectedFeesToken0)
 		assert.NotEqual(t, "", resp.Position.Token0.ID)
 		assert.NotEqual(t, "", resp.Position.Token1.Symbol)
+	})
+
+	t.Run("Get history swap", func(t *testing.T) {
+		poolId := "0x78a763f3bf67326ce03fd02dd1d4f47025279951"
+		endpoint = unigraphclient.Endpoints[unigraphclient.Base]
+		client := unigraphclient.NewClient(endpoint, nil)
+
+		requestOpts := &unigraphclient.RequestOptions{
+			IncludeFields: []string{
+				"*",
+			},
+		}
+		response, err := client.GetSwapHistoryByPoolId(context.Background(), poolId, requestOpts)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		responseBytes, err := json.Marshal(response)
+		if err != nil {
+			fmt.Println("Error marshaling response:", err)
+			return
+		}
+
+		fmt.Println(string(responseBytes))
 	})
 }
