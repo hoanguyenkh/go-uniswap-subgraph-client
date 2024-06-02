@@ -226,13 +226,25 @@ func TestUniswapExampleQueries(t *testing.T) {
 	})
 
 	t.Run("Get history swap", func(t *testing.T) {
-		poolId := "0x78a763f3bf67326ce03fd02dd1d4f47025279951"
+		poolId := "0x0c5527e51d6be6bf3e93711e38feb2ee611c99cb"
 		endpoint = unigraphclient.Endpoints[unigraphclient.Base]
 		client := unigraphclient.NewClient(endpoint, nil)
 
 		requestOpts := &unigraphclient.RequestOptions{
 			IncludeFields: []string{
-				"*",
+				"id",
+				"timestamp",
+				"amount0",
+				"amount1",
+				"amountUSD",
+				"sqrtPriceX96",
+				"sender",
+				"recipient",
+				"pool.token0.id",
+				"pool.token0.symbol",
+				"pool.token1.id",
+				"pool.token1.symbol",
+				"transaction.id",
 			},
 		}
 		response, err := client.GetSwapHistoryByPoolId(context.Background(), poolId, requestOpts)

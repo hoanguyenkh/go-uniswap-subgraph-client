@@ -259,7 +259,7 @@ func assembleQueryWithPoolId(queryType QueryType, model modelFields, opts *Reque
 	case List:
 		parts = []string{
 			fmt.Sprintf("query %s($pool: ID!, $first: Int!, $skip: Int!, $orderBy: String!, $orderDir: String!) {", pluralizeModelName(model.name)),
-			fmt.Sprintf("	%s(pool: $pool, first: $first, skip: $skip, orderBy: $orderBy, orderDirection: $orderDir%s) {", pluralizeModelName(model.name), blockSubstr),
+			fmt.Sprintf("	%s(where: {pool: $pool}, first: $first, skip: $skip, orderBy: $orderBy, orderDirection: $orderDir%s) {", pluralizeModelName(model.name), blockSubstr),
 		}
 	default:
 		return "", fmt.Errorf("unrecognized query type (%v)", queryType)
