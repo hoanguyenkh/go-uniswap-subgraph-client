@@ -120,31 +120,42 @@ func constructListQueryWithId(pool string, model modelFields, opts *RequestOptio
 	return req, nil
 }
 
-func generateSwapsQuery(pairId string, first int, orderBy string, orderDirection string) string {
-	return fmt.Sprintf(`
-	query swaps($pairId: String, $first: Int = %d, $orderBy: String = "%s", $orderDirection: String = "%s") {
-		swaps(where: { pool: $pairId }, first: $first, orderBy: $orderBy, orderDirection: $orderDirection) {
-			id
-			timestamp
-			amount0
-			amount1
-			amountUSD
-
-			pool {
-				token0 {
-					id
-					symbol
-				}
-				token1 {
-					id
-					symbol
-				}
-			}
-			transaction {
-				id
-			}
+func constructListQueryWithMemeToken(memeToken string, model modelFields, opts *RequestOptions) (*graphql.Request, error) {
+	if opts == nil {
+		opts = &RequestOptions{
+			IncludeFields: []string{"*"},
 		}
-	}`, first, orderBy, orderDirection)
+	}
+
+	err := validateRequestOpts(List, opts)
+	if err != nil {
+		return nil, err
+	}
+
+	if slices.Contains(opts.IncludeFields, "*") {
+		fields, err := gatherModelFields(model, opts.ExcludeFields, true)
+		if err != nil {
+			return nil, err
+		}
+		opts.IncludeFields = fields
+	}
+
+	query, err := assembleQueryWithMemeToken(List, model, opts)
+	if err != nil {
+		return nil, err
+	}
+	req := graphql.NewRequest(query)
+	req.Var("memeToken", memeToken)
+	req.Var("first", opts.First)
+	req.Var("skip", opts.Skip)
+	req.Var("orderBy", opts.OrderBy)
+	req.Var("orderDir", opts.OrderDir)
+
+	fmt.Println("*** DEBUG req.Query() ***")
+	fmt.Println(req.Query())
+	fmt.Println("*************")
+
+	return req, nil
 }
 
 // assembles a properly formatted graphql query based on the provided includeFields
@@ -171,74 +182,7 @@ func assembleQuery(queryType QueryType, model modelFields, opts *RequestOptions)
 		return "", fmt.Errorf("unrecognized query type (%v)", queryType)
 	}
 
-	var refFieldMap map[string]fieldRefs = make(map[string]fieldRefs)
-
-	// TODO: think about ways to make the rest of this function more comprehensible
-	for _, field := range opts.IncludeFields {
-		isRef := false
-		for k, v := range model.reference {
-			prefix := fmt.Sprintf("%s.", k)
-			if strings.HasPrefix(field, prefix) {
-				isRef = true
-				refModel, ok := modelMap[v]
-				if !ok {
-					return "", fmt.Errorf("reference field not found (%s)", k)
-				}
-				fieldWithoutPrefix := cutPrefix(field, prefix)
-				fieldRef := refFieldMap[k]
-				if strings.Contains(fieldWithoutPrefix, ".") {
-					subRefFields := strings.Split(fieldWithoutPrefix, ".")
-					subRefModel, ok := modelMap[refModel.reference[subRefFields[0]]]
-					if !ok {
-						return "", fmt.Errorf("sub-reference field not found (%s)", fieldWithoutPrefix)
-					}
-					if !validateField(subRefModel, subRefFields[1]) {
-						return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
-					}
-					fieldRef.refs = append(fieldRef.refs, fieldWithoutPrefix)
-				} else {
-					if !validateField(refModel, fieldWithoutPrefix) {
-						return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
-					}
-					fieldRef.directs = append(fieldRef.directs, fieldWithoutPrefix)
-				}
-				refFieldMap[k] = fieldRef
-				break
-			}
-		}
-		if !isRef {
-			if !validateField(model, field) {
-				return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
-			}
-			parts = append(parts, fmt.Sprintf("		%s", field))
-		}
-	}
-
-	for k, v := range refFieldMap {
-		parts = append(parts, fmt.Sprintf("		%s {", k))
-		if len(v.directs) > 0 {
-			parts = append(parts, "			"+strings.Join(v.directs, "\n			"))
-		}
-		subRefMap := make(map[string][]string)
-		for _, ref := range v.refs {
-			fieldSplit := strings.Split(ref, ".")
-			if len(fieldSplit) < 2 {
-				return "", fmt.Errorf("error parsing reference field (%s)", ref)
-			}
-			parent := fieldSplit[0]
-			child := fieldSplit[1]
-			subRefMap[parent] = append(subRefMap[parent], child)
-		}
-		for subK, subV := range subRefMap {
-			parts = append(parts, fmt.Sprintf("			%s {", subK), "				"+strings.Join(subV, "\n				"), "			}")
-		}
-		parts = append(parts, "		}")
-	}
-
-	parts = append(parts, "	}", "}")
-	query := strings.Join(parts, "\n")
-
-	return query, nil
+	return genQuery(parts, model, opts)
 }
 
 // assembles a properly formatted graphql query based on the provided includeFields
@@ -265,74 +209,34 @@ func assembleQueryWithPoolId(queryType QueryType, model modelFields, opts *Reque
 		return "", fmt.Errorf("unrecognized query type (%v)", queryType)
 	}
 
-	var refFieldMap map[string]fieldRefs = make(map[string]fieldRefs)
+	return genQuery(parts, model, opts)
+}
 
-	// TODO: think about ways to make the rest of this function more comprehensible
-	for _, field := range opts.IncludeFields {
-		isRef := false
-		for k, v := range model.reference {
-			prefix := fmt.Sprintf("%s.", k)
-			if strings.HasPrefix(field, prefix) {
-				isRef = true
-				refModel, ok := modelMap[v]
-				if !ok {
-					return "", fmt.Errorf("reference field not found (%s)", k)
-				}
-				fieldWithoutPrefix := cutPrefix(field, prefix)
-				fieldRef := refFieldMap[k]
-				if strings.Contains(fieldWithoutPrefix, ".") {
-					subRefFields := strings.Split(fieldWithoutPrefix, ".")
-					subRefModel, ok := modelMap[refModel.reference[subRefFields[0]]]
-					if !ok {
-						return "", fmt.Errorf("sub-reference field not found (%s)", fieldWithoutPrefix)
-					}
-					if !validateField(subRefModel, subRefFields[1]) {
-						return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
-					}
-					fieldRef.refs = append(fieldRef.refs, fieldWithoutPrefix)
-				} else {
-					if !validateField(refModel, fieldWithoutPrefix) {
-						return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
-					}
-					fieldRef.directs = append(fieldRef.directs, fieldWithoutPrefix)
-				}
-				refFieldMap[k] = fieldRef
-				break
-			}
-		}
-		if !isRef {
-			if !validateField(model, field) {
-				return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
-			}
-			parts = append(parts, fmt.Sprintf("		%s", field))
-		}
+// assembles a properly formatted graphql query based on the provided includeFields
+func assembleQueryWithMemeToken(queryType QueryType, model modelFields, opts *RequestOptions) (string, error) {
+	var parts []string
+
+	var blockSubstr string = ""
+	if opts.Block != 0 {
+		blockSubstr = fmt.Sprintf(", block: {number: %d}", opts.Block)
 	}
 
-	for k, v := range refFieldMap {
-		parts = append(parts, fmt.Sprintf("		%s {", k))
-		if len(v.directs) > 0 {
-			parts = append(parts, "			"+strings.Join(v.directs, "\n			"))
+	switch queryType {
+	case ById:
+		parts = []string{
+			fmt.Sprintf("query %s($id: ID!) {", model.name),
+			fmt.Sprintf("	%s(id: $id%s) {", model.name, blockSubstr),
 		}
-		subRefMap := make(map[string][]string)
-		for _, ref := range v.refs {
-			fieldSplit := strings.Split(ref, ".")
-			if len(fieldSplit) < 2 {
-				return "", fmt.Errorf("error parsing reference field (%s)", ref)
-			}
-			parent := fieldSplit[0]
-			child := fieldSplit[1]
-			subRefMap[parent] = append(subRefMap[parent], child)
+	case List:
+		parts = []string{
+			fmt.Sprintf("query %s($memeToken: Bytes!, $first: Int!, $skip: Int!, $orderBy: String!, $orderDir: String!) {", pluralizeModelName(model.name)),
+			fmt.Sprintf("	%s(where: {memeToken: $memeToken}, first: $first, skip: $skip, orderBy: $orderBy, orderDirection: $orderDir%s) {", pluralizeModelName(model.name), blockSubstr),
 		}
-		for subK, subV := range subRefMap {
-			parts = append(parts, fmt.Sprintf("			%s {", subK), "				"+strings.Join(subV, "\n				"), "			}")
-		}
-		parts = append(parts, "		}")
+	default:
+		return "", fmt.Errorf("unrecognized query type (%v)", queryType)
 	}
 
-	parts = append(parts, "	}", "}")
-	query := strings.Join(parts, "\n")
-
-	return query, nil
+	return genQuery(parts, model, opts)
 }
 
 // recursively gathers all fields for the given model, while honoring fields to be excluded
@@ -403,7 +307,7 @@ func validateRequestOpts(queryType QueryType, opts *RequestOptions) error {
 			opts.OrderBy = "id"
 		}
 		if opts.OrderDir == "" {
-			opts.OrderDir = "asc"
+			opts.OrderDir = "desc"
 		}
 		if opts.OrderDir != "asc" && opts.OrderDir != "desc" {
 			return errors.New("request options error: 'asc' and 'desc' are the only valid options for OrderDir")
@@ -421,4 +325,74 @@ func pluralizeModelName(name string) string {
 		return "flashes"
 	}
 	return fmt.Sprintf("%ss", name)
+}
+
+func genQuery(parts []string, model modelFields, opts *RequestOptions) (string, error) {
+	var refFieldMap map[string]fieldRefs = make(map[string]fieldRefs)
+
+	// TODO: think about ways to make the rest of this function more comprehensible
+	for _, field := range opts.IncludeFields {
+		isRef := false
+		for k, v := range model.reference {
+			prefix := fmt.Sprintf("%s.", k)
+			if strings.HasPrefix(field, prefix) {
+				isRef = true
+				refModel, ok := modelMap[v]
+				if !ok {
+					return "", fmt.Errorf("reference field not found (%s)", k)
+				}
+				fieldWithoutPrefix := cutPrefix(field, prefix)
+				fieldRef := refFieldMap[k]
+				if strings.Contains(fieldWithoutPrefix, ".") {
+					subRefFields := strings.Split(fieldWithoutPrefix, ".")
+					subRefModel, ok := modelMap[refModel.reference[subRefFields[0]]]
+					if !ok {
+						return "", fmt.Errorf("sub-reference field not found (%s)", fieldWithoutPrefix)
+					}
+					if !validateField(subRefModel, subRefFields[1]) {
+						return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
+					}
+					fieldRef.refs = append(fieldRef.refs, fieldWithoutPrefix)
+				} else {
+					if !validateField(refModel, fieldWithoutPrefix) {
+						return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
+					}
+					fieldRef.directs = append(fieldRef.directs, fieldWithoutPrefix)
+				}
+				refFieldMap[k] = fieldRef
+				break
+			}
+		}
+		if !isRef {
+			if !validateField(model, field) {
+				return "", fmt.Errorf("unrecognized field given in opts.IncludeFields (%s)", field)
+			}
+			parts = append(parts, fmt.Sprintf("		%s", field))
+		}
+	}
+
+	for k, v := range refFieldMap {
+		parts = append(parts, fmt.Sprintf("		%s {", k))
+		if len(v.directs) > 0 {
+			parts = append(parts, "			"+strings.Join(v.directs, "\n			"))
+		}
+		subRefMap := make(map[string][]string)
+		for _, ref := range v.refs {
+			fieldSplit := strings.Split(ref, ".")
+			if len(fieldSplit) < 2 {
+				return "", fmt.Errorf("error parsing reference field (%s)", ref)
+			}
+			parent := fieldSplit[0]
+			child := fieldSplit[1]
+			subRefMap[parent] = append(subRefMap[parent], child)
+		}
+		for subK, subV := range subRefMap {
+			parts = append(parts, fmt.Sprintf("			%s {", subK), "				"+strings.Join(subV, "\n				"), "			}")
+		}
+		parts = append(parts, "		}")
+	}
+
+	parts = append(parts, "	}", "}")
+	query := strings.Join(parts, "\n")
+	return query, nil
 }

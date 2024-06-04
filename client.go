@@ -64,6 +64,14 @@ func (c *Client) GetSwapHistoryByPoolId(ctx context.Context, poolId string, opts
 	return executeRequestAndConvert(ctx, req, ListSwapsResponse{}, c)
 }
 
+func (c *Client) GetSwapHistoryByMemeToken(ctx context.Context, memeToken string, opts *RequestOptions) (*MemeCoinExitsResponse, error) {
+	req, err := constructListQueryWithMemeToken(memeToken, MemeFields, opts)
+	if err != nil {
+		return nil, err
+	}
+	return executeRequestAndConvert(ctx, req, MemeCoinExitsResponse{}, c)
+}
+
 func (c *Client) ListPools(ctx context.Context, opts *RequestOptions) (*ListPoolsResponse, error) {
 	req, err := constructListQuery(PoolFields, opts)
 	if err != nil {

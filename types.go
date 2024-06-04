@@ -53,7 +53,8 @@ type Response interface {
 		TickHourDataResponse | ListTickHourDatasResponse |
 		TickDayDataResponse | ListTickDayDatasResponse |
 		TokenDayDataResponse | ListTokenDayDatasResponse |
-		TokenHourDataResponse | ListTokenHourDatasResponse
+		TokenHourDataResponse | ListTokenHourDatasResponse |
+		MemeCoinExitsResponse
 }
 
 // intermediate struct used to construct queries

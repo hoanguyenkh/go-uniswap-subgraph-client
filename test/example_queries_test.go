@@ -260,4 +260,27 @@ func TestUniswapExampleQueries(t *testing.T) {
 
 		fmt.Println(string(responseBytes))
 	})
+
+	t.Run("Get meme buy/sell history", func(t *testing.T) {
+		memeAddress := "0x9839e570cbaeb1715d8191f33d2b58745142cf87"
+		client := unigraphclient.NewClient("https://api.studio.thegraph.com/query/76502/membots-ai-memeception-mvp/version/latest", nil)
+
+		requestOpts := &unigraphclient.RequestOptions{
+			IncludeFields: []string{
+				"*",
+			},
+		}
+		response, err := client.GetSwapHistoryByMemeToken(context.Background(), memeAddress, requestOpts)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		responseBytes, err := json.Marshal(response)
+		if err != nil {
+			fmt.Println("Error marshaling response:", err)
+			return
+		}
+
+		fmt.Println(string(responseBytes))
+	})
 }
