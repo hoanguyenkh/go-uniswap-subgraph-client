@@ -976,7 +976,7 @@ var TokenHourDataFields modelFields = modelFields{
 }
 
 type MemeCoinExitsResponse struct {
-	MemecoinExits []MemeHistory `json:"memecoinExits"`
+	MemecoinBuyExits []MemeHistory `json:"memecoinBuyExits"`
 }
 
 type MemeHistory struct {
@@ -988,10 +988,11 @@ type MemeHistory struct {
 	BlockNumber     string `json:"blockNumber"`
 	BlockTimestamp  string `json:"blockTimestamp"`
 	TransactionHash string `json:"transactionHash"`
+	Type            string `json:"type"`
 }
 
 var MemeFields modelFields = modelFields{
-	name: "memecoinExit",
+	name: "memecoinBuyExit",
 	direct: []string{
 		"id",
 		"memeToken",
@@ -1001,5 +1002,6 @@ var MemeFields modelFields = modelFields{
 		"blockNumber",
 		"blockTimestamp",
 		"transactionHash",
+		"type",
 	},
 }
