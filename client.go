@@ -2,6 +2,7 @@ package unigraphclient
 
 import (
 	"context"
+	"encoding/json"
 	"net/http"
 
 	"github.com/emersonmacro/go-uniswap-subgraph-client/graphql"
@@ -70,6 +71,14 @@ func (c *Client) GetSwapHistoryByMemeToken(ctx context.Context, memeToken string
 		return nil, err
 	}
 	return executeRequestAndConvert(ctx, req, MemeCoinExitsResponse{}, c)
+}
+
+func (c *Client) GetMemeTiersByMemeToken(ctx context.Context, memeToken string, opts *RequestOptions) (*MemeCreatedResponse, error) {
+	req, err := constructListQueryWithMemeToken(memeToken, MemeCreatedFields, opts)
+	if err != nil {
+		return nil, err
+	}
+	return executeRequestAndConvert(ctx, req, MemeCreatedResponse{}, c)
 }
 
 func (c *Client) ListPools(ctx context.Context, opts *RequestOptions) (*ListPoolsResponse, error) {
@@ -358,6 +367,18 @@ func executeRequestAndConvert[T Response](ctx context.Context, req *graphql.Requ
 		return nil, err
 	}
 
+	// Convert resp to JSON bytes first
+	respBytes, err := json.Marshal(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshal JSON bytes into the generic type T
+	if err := json.Unmarshal(respBytes, &converted); err != nil {
+		return nil, err
+	}
+
+	// Optionally use mapstructure to decode if there are complex nested structures
 	if err := mapstructure.Decode(resp, &converted); err != nil {
 		return nil, err
 	}

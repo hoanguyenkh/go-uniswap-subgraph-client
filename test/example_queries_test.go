@@ -283,4 +283,27 @@ func TestUniswapExampleQueries(t *testing.T) {
 
 		fmt.Println(string(responseBytes))
 	})
+
+	t.Run("Get meme create tiers", func(t *testing.T) {
+		memeAddress := "0xc511c410beb32c206a657f2dd0cd412862281d29"
+		client := unigraphclient.NewClient("https://api.studio.thegraph.com/query/76502/membots-ai-memeception-mvp/version/latest", nil)
+
+		requestOpts := &unigraphclient.RequestOptions{
+			IncludeFields: []string{
+				"*",
+			},
+		}
+		response, err := client.GetMemeTiersByMemeToken(context.Background(), memeAddress, requestOpts)
+		if err != nil {
+			fmt.Println(err)
+		}
+
+		responseBytes, err := json.Marshal(response)
+		if err != nil {
+			fmt.Println("Error marshaling response:", err)
+			return
+		}
+
+		fmt.Println(string(responseBytes))
+	})
 }

@@ -3,7 +3,7 @@ module github.com/emersonmacro/go-uniswap-subgraph-client
 go 1.21.0
 
 require (
-	github.com/mitchellh/mapstructure v1.5.0
+	github.com/mitchellh/mapstructure v0.0.0-20231216201459-8508981c8b6c
 	github.com/pkg/errors v0.9.1
 	github.com/stretchr/testify v1.8.4
 )

@@ -30,6 +30,7 @@ var modelMap map[string]modelFields = map[string]modelFields{
 	"tickDayData":      TickDayDataFields,
 	"tokenDayData":     TokenDayDataFields,
 	"tokenHourData":    TokenHourDataFields,
+	"tier":             TierFields,
 }
 
 type FactoryResponse struct {
@@ -1003,5 +1004,59 @@ var MemeFields modelFields = modelFields{
 		"blockTimestamp",
 		"transactionHash",
 		"type",
+	},
+}
+
+type MemeCreatedResponse struct {
+	MemeCreateds []MemeCreated `json:"memeCreateds"`
+}
+
+type MemeCreated struct {
+	ID           string `json:"id"`
+	MemeToken    string `json:"memeToken"`
+	ParamsSymbol string `json:"params_symbol"`
+	ParamsName   string `json:"params_name"`
+	Type         string `json:"type"`
+	Tiers        []Tier `json:"tiers"`
+}
+
+type Tier struct {
+	ID              string `json:"id"`
+	NftId           string `json:"nftId"`
+	LowerId         string `json:"lowerId"`
+	UpperId         string `json:"upperId"`
+	NftSymbol       string `json:"nftSymbol"`
+	NftName         string `json:"nftName"`
+	AmountThreshold string `json:"amountThreshold"`
+	BaseURL         string `json:"baseURL"`
+	IsFungible      bool   `json:"isFungible"`
+}
+
+var MemeCreatedFields modelFields = modelFields{
+	name: "memeCreated",
+	direct: []string{
+		"id",
+		"memeToken",
+		"params_symbol",
+		"params_name",
+		"type",
+	},
+	reference: map[string]string{
+		"tiers": "tier", // [Tier!]!
+	},
+}
+
+var TierFields modelFields = modelFields{
+	name: "tier",
+	direct: []string{
+		"id",
+		"nftId",
+		"lowerId",
+		"upperId",
+		"nftSymbol",
+		"nftName",
+		"amountThreshold",
+		"baseURL",
+		"isFungible",
 	},
 }
